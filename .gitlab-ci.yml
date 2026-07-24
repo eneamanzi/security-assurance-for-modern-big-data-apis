@@ -1,0 +1,14 @@
+image: core.harbor.ricerca.sesar.di.unimi.it/docker/texlive/texlive
+
+stages:
+  - build
+
+compile_main.pdf:
+  stage: build
+  script:
+    - latexmk --shell-escape --pdflatex=lualatex -pdf main.tex
+  artifacts:
+    paths:
+      - main.pdf
+  rules:
+    - when: manual

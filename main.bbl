@@ -1,0 +1,108 @@
+\begin{thebibliography}{21}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\href}[2]{#2}
+\providecommand{\path}[1]{#1}
+\providecommand{\DOIprefix}{doi:}
+\providecommand{\ArXivprefix}{arXiv:}
+\providecommand{\URLprefix}{URL: }
+\providecommand{\Pubmedprefix}{pmid:}
+\providecommand{\doi}[1]{\href{http://dx.doi.org/#1}{\path{#1}}}
+\providecommand{\Pubmed}[1]{\href{pmid:#1}{\path{#1}}}
+\providecommand{\bibinfo}[2]{#2}
+\ifx\xfnm\relax \def\xfnm[#1]{\unskip,\space#1}\fi
+%Type = Article
+\bibitem[{Anisetti et~al.(2023)Anisetti, Ardagna, and Berto}]{anisettiAssuranceProcessBig2023}
+\bibinfo{author}{M.~Anisetti}, \bibinfo{author}{C.~A. Ardagna}, \bibinfo{author}{F.~Berto},
+\newblock \bibinfo{title}{An assurance process for {{Big Data}} trustworthiness},
+\newblock \bibinfo{journal}{Future Generation Computer Systems} \bibinfo{volume}{146} (\bibinfo{year}{2023}) \bibinfo{pages}{34--46}. \URLprefix \url{https://www.sciencedirect.com/science/article/pii/S0167739X23001371}. \DOIprefix\doi{10.1016/j.future.2023.04.003}.
+%Type = Article
+\bibitem[{Ardagna et~al.(2023)Ardagna, Bena, Hebert, Krotsiani, Kloukinas, and Spanoudakis}]{ardagnaBigDataAssurance2023}
+\bibinfo{author}{C.~A. Ardagna}, \bibinfo{author}{N.~Bena}, \bibinfo{author}{C.~Hebert}, \bibinfo{author}{M.~Krotsiani}, \bibinfo{author}{C.~Kloukinas}, \bibinfo{author}{G.~Spanoudakis},
+\newblock \bibinfo{title}{Big {{Data Assurance}}: {{An Approach Based}} on {{Service-Level Agreements}}},
+\newblock \bibinfo{journal}{Big Data} \bibinfo{volume}{11} (\bibinfo{year}{2023}) \bibinfo{pages}{239--254}. \URLprefix \url{https://journals.sagepub.com/action/showAbstract}. \DOIprefix\doi{10.1089/big.2021.0369}.
+%Type = Inproceedings
+\bibitem[{Anisetti et~al.(2022)Anisetti, Bena, Berto, and Jeon}]{anisettiDevSecOpsbasedAssuranceProcess2022}
+\bibinfo{author}{M.~Anisetti}, \bibinfo{author}{N.~Bena}, \bibinfo{author}{F.~Berto}, \bibinfo{author}{G.~Jeon},
+\newblock \bibinfo{title}{A {{DevSecOps-based Assurance Process}} for {{Big Data Analytics}}},
+\newblock in: \bibinfo{booktitle}{2022 {{IEEE International Conference}} on {{Web Services}} ({{ICWS}})}, \bibinfo{year}{2022}, pp. \bibinfo{pages}{1--10}. \URLprefix \url{https://ieeexplore.ieee.org/abstract/document/9885738}. \DOIprefix\doi{10.1109/ICWS55610.2022.00017}.
+%Type = Inproceedings
+\bibitem[{Anisetti et~al.(2021)Anisetti, Ardagna, Braghin, Damiani, Polimeno, and Balestrucci}]{anisettiDynamicScalableEnforcement2021}
+\bibinfo{author}{M.~Anisetti}, \bibinfo{author}{C.~A. Ardagna}, \bibinfo{author}{C.~Braghin}, \bibinfo{author}{E.~Damiani}, \bibinfo{author}{A.~Polimeno}, \bibinfo{author}{A.~Balestrucci},
+\newblock \bibinfo{title}{Dynamic and {{Scalable Enforcement}} of {{Access Control Policies}} for {{Big Data}}},
+\newblock in: \bibinfo{booktitle}{Proceedings of the 13th {{International Conference}} on {{Management}} of {{Digital EcoSystems}}}, \bibinfo{publisher}{ACM}, \bibinfo{address}{Virtual Event Tunisia}, \bibinfo{year}{2021}, pp. \bibinfo{pages}{71--78}. \URLprefix \url{https://dl.acm.org/doi/10.1145/3444757.3485107}. \DOIprefix\doi{10.1145/3444757.3485107}.
+%Type = Article
+\bibitem[{Polimeno et~al.(2025)Polimeno, Mignone, Braghin, Anisetti, Ceci, Malerba, and Ardagna}]{polimenoBalancingProtectionQuality2025}
+\bibinfo{author}{A.~Polimeno}, \bibinfo{author}{P.~Mignone}, \bibinfo{author}{C.~Braghin}, \bibinfo{author}{M.~Anisetti}, \bibinfo{author}{M.~Ceci}, \bibinfo{author}{D.~Malerba}, \bibinfo{author}{C.~A. Ardagna},
+\newblock \bibinfo{title}{Balancing {{Protection}} and {{Quality}} in {{Big Data Analytics Pipelines}}},
+\newblock \bibinfo{journal}{Big Data} \bibinfo{volume}{13} (\bibinfo{year}{2025}) \bibinfo{pages}{127--143}. \DOIprefix\doi{10.1089/big.2023.0065}.
+%Type = Article
+\bibitem[{Golmohammadi et~al.(2023)Golmohammadi, Zhang, and Arcuri}]{golmohammadiTestingRESTfulAPIs2023}
+\bibinfo{author}{A.~Golmohammadi}, \bibinfo{author}{M.~Zhang}, \bibinfo{author}{A.~Arcuri},
+\newblock \bibinfo{title}{Testing {{RESTful APIs}}: {{A Survey}}},
+\newblock \bibinfo{journal}{ACM Transactions on Software Engineering and Methodology} \bibinfo{volume}{33} (\bibinfo{year}{2023}) \bibinfo{pages}{27:1--27:41}. \URLprefix \url{https://dl.acm.org/doi/10.1145/3617175}. \DOIprefix\doi{10.1145/3617175}.
+%Type = Article
+\bibitem[{Barr et~al.(2015)Barr, Harman, McMinn, Shahbaz, and Yoo}]{barrOracleProblemSoftware2015}
+\bibinfo{author}{E.~T. Barr}, \bibinfo{author}{M.~Harman}, \bibinfo{author}{P.~McMinn}, \bibinfo{author}{M.~Shahbaz}, \bibinfo{author}{S.~Yoo},
+\newblock \bibinfo{title}{The {{Oracle Problem}} in {{Software Testing}}: {{A Survey}}},
+\newblock \bibinfo{journal}{IEEE Transactions on Software Engineering} \bibinfo{volume}{41} (\bibinfo{year}{2015}) \bibinfo{pages}{507--525}. \URLprefix \url{https://ieeexplore.ieee.org/document/6963470}. \DOIprefix\doi{10.1109/TSE.2014.2372785}.
+%Type = Inproceedings
+\bibitem[{Du et~al.(2024)Du, Li, Wang, Chen, Zhao, Zhu, Han, Wang, and Xue}]{duVulnerabilityorientedTestingRESTful2024}
+\bibinfo{author}{W.~Du}, \bibinfo{author}{J.~Li}, \bibinfo{author}{Y.~Wang}, \bibinfo{author}{L.~Chen}, \bibinfo{author}{R.~Zhao}, \bibinfo{author}{J.~Zhu}, \bibinfo{author}{Z.~Han}, \bibinfo{author}{Y.~Wang}, \bibinfo{author}{Z.~Xue},
+\newblock \bibinfo{title}{Vulnerability-oriented {{Testing}} for {{RESTful APIs}}},
+\newblock in: \bibinfo{booktitle}{33rd {{USENIX Security Symposium}} ({{USENIX Security}} 24)}, \bibinfo{year}{2024}, pp. \bibinfo{pages}{739--755}. \URLprefix \url{https://www.usenix.org/conference/usenixsecurity24/presentation/du}.
+%Type = Inproceedings
+\bibitem[{Atlidakis et~al.(2019)Atlidakis, Godefroid, and Polishchuk}]{atlidakisRESTlerStatefulREST2019a}
+\bibinfo{author}{V.~Atlidakis}, \bibinfo{author}{P.~Godefroid}, \bibinfo{author}{M.~Polishchuk},
+\newblock \bibinfo{title}{{{RESTler}}: {{Stateful REST API Fuzzing}}},
+\newblock in: \bibinfo{booktitle}{2019 {{IEEE}}/{{ACM}} 41st {{International Conference}} on {{Software Engineering}} ({{ICSE}})}, \bibinfo{publisher}{IEEE}, \bibinfo{address}{Montreal, QC, Canada}, \bibinfo{year}{2019}, pp. \bibinfo{pages}{748--758}. \URLprefix \url{https://ieeexplore.ieee.org/document/8811961/}. \DOIprefix\doi{10.1109/ICSE.2019.00083}.
+%Type = Inproceedings
+\bibitem[{Atlidakis et~al.(2020)Atlidakis, Godefroid, and Polishchuk}]{atlidakisCheckingSecurityProperties2020}
+\bibinfo{author}{V.~Atlidakis}, \bibinfo{author}{P.~Godefroid}, \bibinfo{author}{M.~Polishchuk},
+\newblock \bibinfo{title}{Checking {{Security Properties}} of {{Cloud Service REST APIs}}},
+\newblock in: \bibinfo{booktitle}{2020 {{IEEE}} 13th {{International Conference}} on {{Software Testing}}, {{Validation}} and {{Verification}} ({{ICST}})}, \bibinfo{publisher}{IEEE}, \bibinfo{address}{Porto, Portugal}, \bibinfo{year}{2020}, pp. \bibinfo{pages}{387--397}. \URLprefix \url{https://ieeexplore.ieee.org/document/9159084/}. \DOIprefix\doi{10.1109/ICST46399.2020.00046}.
+%Type = Inproceedings
+\bibitem[{Deng et~al.(2023)Deng, Zhang, Li, Liu, Zhang, Liu, Yu, and Wang}]{dengNAUTILUSAutomatedRESTful2023}
+\bibinfo{author}{G.~Deng}, \bibinfo{author}{Z.~Zhang}, \bibinfo{author}{Y.~Li}, \bibinfo{author}{Y.~Liu}, \bibinfo{author}{T.~Zhang}, \bibinfo{author}{Y.~Liu}, \bibinfo{author}{G.~Yu}, \bibinfo{author}{D.~Wang},
+\newblock \bibinfo{title}{{{NAUTILUS}}: {{Automated RESTful API Vulnerability Detection}}},
+\newblock in: \bibinfo{booktitle}{32nd {{USENIX Security Symposium}} ({{USENIX Security}} 23)}, \bibinfo{year}{2023}, pp. \bibinfo{pages}{5593--5609}. \URLprefix \url{https://www.usenix.org/conference/usenixsecurity23/presentation/deng-gelei}.
+%Type = Inproceedings
+\bibitem[{{Hatfield-Dodds} and Dygalo(2022)}]{schemathesisDerivingSemanticsawareFuzzers2022}
+\bibinfo{author}{Z.~{Hatfield-Dodds}}, \bibinfo{author}{D.~Dygalo},
+\newblock \bibinfo{title}{Deriving semantics-aware fuzzers from web {{API}} schemas},
+\newblock in: \bibinfo{booktitle}{Proceedings of the {{ACM}}/{{IEEE}} 44th {{International Conference}} on {{Software Engineering}}: {{Companion Proceedings}}}, {{ICSE}} '22, \bibinfo{publisher}{Association for Computing Machinery}, \bibinfo{address}{New York, NY, USA}, \bibinfo{year}{2022}, pp. \bibinfo{pages}{345--346}. \URLprefix \url{https://dl.acm.org/doi/10.1145/3510454.3528637}. \DOIprefix\doi{10.1145/3510454.3528637}.
+%Type = Inproceedings
+\bibitem[{Alonso et~al.(2023)Alonso, Segura, and {Ruiz-Cort{\'e}s}}]{alonsoAGORAAutomatedGeneration2023}
+\bibinfo{author}{J.~C. Alonso}, \bibinfo{author}{S.~Segura}, \bibinfo{author}{A.~{Ruiz-Cort{\'e}s}},
+\newblock \bibinfo{title}{{{AGORA}}: {{Automated Generation}} of {{Test Oracles}} for {{REST APIs}}},
+\newblock in: \bibinfo{booktitle}{Proceedings of the 32nd {{ACM SIGSOFT International Symposium}} on {{Software Testing}} and {{Analysis}}}, {{ISSTA}} 2023, \bibinfo{publisher}{Association for Computing Machinery}, \bibinfo{address}{New York, NY, USA}, \bibinfo{year}{2023}, pp. \bibinfo{pages}{1018--1030}. \URLprefix \url{https://dl.acm.org/doi/10.1145/3597926.3598114}. \DOIprefix\doi{10.1145/3597926.3598114}.
+%Type = Article
+\bibitem[{Alonso et~al.(2025{\natexlab{a}})Alonso, Ernst, Segura, and {Ruiz-Cort{\'e}s}}]{alonsoAgora+TestOracleGeneration2025}
+\bibinfo{author}{J.~C. Alonso}, \bibinfo{author}{M.~D. Ernst}, \bibinfo{author}{S.~Segura}, \bibinfo{author}{A.~{Ruiz-Cort{\'e}s}},
+\newblock \bibinfo{title}{Test {{Oracle Generation}} for {{REST APIs}}},
+\newblock \bibinfo{journal}{ACM Transactions on Software Engineering and Methodology} \bibinfo{volume}{35} (\bibinfo{year}{2025}{\natexlab{a}}) \bibinfo{pages}{19:1--19:37}. \URLprefix \url{https://dl.acm.org/doi/10.1145/3726524}. \DOIprefix\doi{10.1145/3726524}.
+%Type = Inproceedings
+\bibitem[{Alonso et~al.(2025{\natexlab{b}})Alonso, {Martin-Lopez}, Segura, Bavota, and {Ruiz-Cort{\'e}s}}]{alonsoSATORIStaticTest2025}
+\bibinfo{author}{J.~C. Alonso}, \bibinfo{author}{A.~{Martin-Lopez}}, \bibinfo{author}{S.~Segura}, \bibinfo{author}{G.~Bavota}, \bibinfo{author}{A.~{Ruiz-Cort{\'e}s}},
+\newblock \bibinfo{title}{{{SATORI}}: {{Static Test Oracle Generation}} for {{REST APIs}}},
+\newblock in: \bibinfo{booktitle}{2025 40th {{IEEE}}/{{ACM International Conference}} on {{Automated Software Engineering}} ({{ASE}})}, \bibinfo{year}{2025}{\natexlab{b}}, pp. \bibinfo{pages}{1364--1376}. \URLprefix \url{https://ieeexplore.ieee.org/document/11334625}. \DOIprefix\doi{10.1109/ASE63991.2025.00116}.
+%Type = Misc
+\bibitem[{Sahin et~al.(2026)Sahin, Zhang, and Arcuri}]{sahinEnhancingRESTAPI2026}
+\bibinfo{author}{O.~Sahin}, \bibinfo{author}{M.~Zhang}, \bibinfo{author}{A.~Arcuri}, \bibinfo{title}{Enhancing {{REST API Fuzzing}} with {{Access Policy Violation Checks}} and {{Injection Attacks}}}, \bibinfo{year}{2026}. \URLprefix \url{http://arxiv.org/abs/2604.00702}. \DOIprefix\doi{10.48550/arXiv.2604.00702}. \href{http://arxiv.org/abs/2604.00702}{{\tt arXiv:2604.00702}}.
+%Type = Techreport
+\bibitem[{Rose et~al.(2020)Rose, Borchert, Mitchell, and Connelly}]{roseZeroTrustArchitecture2020}
+\bibinfo{author}{S.~Rose}, \bibinfo{author}{O.~Borchert}, \bibinfo{author}{S.~Mitchell}, \bibinfo{author}{S.~Connelly}, \bibinfo{title}{Zero {{Trust Architecture}}}, \bibinfo{type}{Technical Report}, {National Institute of Standards and Technology}, \bibinfo{year}{2020}. \URLprefix \url{https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-207.pdf}. \DOIprefix\doi{10.6028/NIST.SP.800-207}.
+%Type = Misc
+\bibitem[{{OWASP Foundation}(2023)}]{OWASPTop10}
+\bibinfo{author}{{OWASP Foundation}}, \bibinfo{title}{{{OWASP Top}} 10 {{API Security Risks}} -- 2023}, \bibinfo{year}{2023}. \URLprefix \url{https://owasp.org/API-Security/editions/2023/en/0x11-t10/}.
+%Type = Techreport
+\bibitem[{Chandramouli and Butcher(2026)}]{chandramouliGuidelinesAPIProtection2026}
+\bibinfo{author}{R.~Chandramouli}, \bibinfo{author}{Z.~Butcher}, \bibinfo{title}{Guidelines for {{API Protection}} for {{Cloud-Native Systems}}}, \bibinfo{type}{Technical Report} \bibinfo{number}{NIST Special Publication (SP) 800-228}, {National Institute of Standards and Technology}, \bibinfo{year}{2026}. \URLprefix \url{https://csrc.nist.gov/pubs/sp/800/228/upd1/final}. \DOIprefix\doi{10.6028/NIST.SP.800-228-upd1}.
+%Type = Misc
+\bibitem[{{The Forgejo Contributors}(2026)}]{forgejoContributors2026}
+\bibinfo{author}{{The Forgejo Contributors}}, \bibinfo{title}{Forgejo: {{Beyond}} coding. {{We}} forge.}, \bibinfo{year}{2026}. \URLprefix \url{https://forgejo.org/}.
+%Type = Misc
+\bibitem[{{Kong Inc.}(2026)}]{kongGateway2026}
+\bibinfo{author}{{Kong Inc.}}, \bibinfo{title}{Kong {{Gateway}}}, \bibinfo{year}{2026}. \URLprefix \url{https://konghq.com/products/kong-gateway}.
+
+\end{thebibliography}

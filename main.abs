@@ -1,0 +1,11 @@
+Modern Big Data systems increasingly deliver their value through pipelines composed of services distributed across microservice architectures, and every access to their data and processing capabilities crosses a REST API, typically exposed through a gateway.
+  Assurance of Big Data trustworthiness has so far been addressed mainly at the infrastructure and pipeline levels, while the interface level - where authentication, authorization, and data exposure are actually enforced - remains comparatively overlooked.
+  Automated API testing compounds the gap: it has traditionally focused on functional correctness, and the few security-oriented tools operate at the syntactic level of requests and responses, unable to detect vulnerabilities tied to the target's semantic behavior.
+  Four of the top five categories in the OWASP API Security Top 10 (2023) belong to this class, and deriving evaluation criteria for them from security semantics remains one of the least explored challenges in the literature.
+  Existing solutions further trade portability off against depth, and non-deterministic execution undermines reproducibility.
+
+  This work proposes a contract-driven approach to the security assurance of Big Data service APIs.
+  Leveraging the target's OpenAPI specification, the framework generates syntactically valid probes and derives evaluation criteria from the semantics of the assessed controls, embedding them into deterministic test oracles organized into an eight-domain taxonomy that scales coverage with the privileges available during testing.
+  The approach was validated on Forgejo 14.0.3 deployed behind Kong 3.9, instantiating the repository service through which Big Data pipelines are developed and delivered. Results show that the framework correctly classified all test cases, revealed a real discrepancy between the specification's declared requirements and the target's actual behavior, and produced identical outputs across independent runs.
+
+  Overall, this work contributes an implementation-agnostic eight-domain taxonomy for the security assurance of Big Data service interfaces, a systematic approach to the oracle problem grounded in security semantics, and a deterministic, DAG-based assessment engine ready for integration into automated delivery pipelines.

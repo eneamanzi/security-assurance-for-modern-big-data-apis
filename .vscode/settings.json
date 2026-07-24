@@ -1,0 +1,39 @@
+{
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "Compila (LuaLaTeX)",
+            "tools": [
+                "latexmk-lua",
+                "qpdf-linearize"
+            ]
+        }
+    ],
+    "latex-workshop.formatting.latex": "latexindent",
+    "latex-workshop.synctex.afterBuild.enabled": true,
+    "latex-workshop.latex.tools": [
+        {
+            "name": "latexmk-lua",
+            "command": "latexmk",
+            "args": [
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-shell-escape",
+                "-pdflua",
+                "%DOC%"
+            ]
+        },
+        {
+            "name": "qpdf-linearize",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-Command",
+                "if (Get-Command qpdf -ErrorAction SilentlyContinue) { $p = '%OUTDIR%/%DOCFILE%.pdf'; if (Test-Path $p) { $tmp = $p + '.qpdf.tmp'; qpdf --linearize --newline-before-endstream $p $tmp; if ($LASTEXITCODE -eq 0 -or $LASTEXITCODE -eq 3) { Move-Item -Force $tmp $p } } }"
+            ]
+        }
+    ],
+    "[latex]": {
+        "editor.formatOnSave": true
+    }
+}

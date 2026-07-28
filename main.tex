@@ -95,17 +95,24 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-  Modern Big Data systems increasingly deliver their value through pipelines composed of services distributed across microservice architectures, and every access to their data and processing capabilities crosses a REST API, typically exposed through a gateway.
-  Assurance of Big Data trustworthiness has so far been addressed mainly at the infrastructure and pipeline levels, while the interface level - where authentication, authorization, and data exposure are actually enforced - remains comparatively overlooked.
-  Automated API testing compounds the gap: it has traditionally focused on functional correctness, and the few security-oriented tools operate at the syntactic level of requests and responses, unable to detect vulnerabilities tied to the target's semantic behavior.
-  Four of the top five categories in the OWASP API Security Top 10 (2023) belong to this class, and deriving evaluation criteria for them from security semantics remains one of the least explored challenges in the literature.
-  Existing solutions further trade portability off against depth, and non-deterministic execution undermines reproducibility.
+  %Modern Big Data systems increasingly deliver their value through pipelines composed of services distributed across microservice architectures, and every access to their data and processing capabilities crosses a REST API, typically exposed through a gateway.
+  Modern Big Data systems often deliver value through distributed data pipelines and microservice-based architectures, with data and processing capabilities commonly exposed through APIs, frequently via an API gateway.
+  %Assurance of such Big Data systems has so far been addressed mainly at the infrastructure and pipeline levels, while the interface level - where authentication, authorization, and data exposure are actually enforced - remains comparatively overlooked.
+
+  Assurance of such Big Data systems has so far been addressed primarily on infrastructure and pipelines, with comparatively less attention to the interface layer where access control and data exposure are enforced.
+
+  %Automated API testing compounds the gap: it has traditionally focused on functional correctness, and the few security-oriented tools operate at the syntactic level of requests and responses, unable to detect vulnerabilities tied to the target's semantic behavior.
+  %Four of the top five categories in the OWASP API Security Top 10 (2023) belong to this class, and deriving evaluation criteria for them from security semantics remains one of the least explored challenges in the literature.
+
+  Automated API testing has traditionally focused on functional correctness, while security testing remains limited. Existing approaches largely operate at the syntactic level of requests and responses, making them ineffective at detecting vulnerabilities that stem from semantic behavior, even though such vulnerabilities account for most of the top-ranked OWASP API security risks.
+
+  %Existing solutions further trade portability off against depth, and non-deterministic execution undermines reproducibility.
 
   This work proposes a contract-driven approach to the security assurance of Big Data service APIs.
   Leveraging the target's OpenAPI specification, the framework generates syntactically valid probes and derives evaluation criteria from the semantics of the assessed controls, embedding them into deterministic test oracles organized into an eight-domain taxonomy that scales coverage with the privileges available during testing.
   The approach was validated on Forgejo 14.0.3 deployed behind Kong 3.9, instantiating the repository service through which Big Data pipelines are developed and delivered. Results show that the framework correctly classified all test cases, revealed a real discrepancy between the specification's declared requirements and the target's actual behavior, and produced identical outputs across independent runs.
 
-  Overall, this work contributes an implementation-agnostic eight-domain taxonomy for the security assurance of Big Data service interfaces, a systematic approach to the oracle problem grounded in security semantics, and a deterministic, DAG-based assessment engine ready for integration into automated delivery pipelines.
+  %Overall, this work contributes an implementation-agnostic eight-domain taxonomy for the security assurance of Big Data service interfaces, a systematic approach to the oracle problem grounded in security semantics, and a deterministic, DAG-based assessment engine ready for integration into automated delivery pipelines.
 \end{abstract}
 
 %%
@@ -130,7 +137,7 @@
 \label{sec:intro}
 %% ============================================================================
 
-Modern Big Data systems deliver their value through pipelines composed of distributed services -- ingestion, storage, processing, serving -- rather than through a single monolithic engine.
+Modern Big Data systems deliver their value through pipelines composed of distributed services, (i.e., ingestion, storage, processing, serving) rather than through a single monolithic engine.
 Trustworthiness in this setting cannot be a property of one layer alone: it must hold at the pipeline level, at the level of the ecosystem of services executing it, at the level of the data it governs, and at the interface level, and it must hold continuously, as pipelines evolve, rather than as a one-off certificate issued at deployment time.
 
 Existing work on Big Data assurance addresses the first two levels. Anisetti et al. propose an assurance process for Big Data pipelines and their underlying ecosystem~\cite{anisettiAssuranceProcessBig2023}; Ardagna et al. address the same problem through service-level agreements~\cite{ardagnaBigDataAssurance2023}; continuous verification across the pipeline life cycle has been framed as a DevSecOps activity~\cite{anisettiDevSecOpsbasedAssuranceProcess2022}; and access control has been enforced at data-ingestion time, an approach recently extended into an attribute-based data engine~\cite{anisettiDynamicScalableEnforcement2021,polimenoBalancingProtectionQuality2025}.
@@ -138,12 +145,12 @@ Across this body of work, the interface level is the least covered.
 
 Yet the interface is where enforcement actually happens. Every access to a Big Data pipeline and to the data it processes crosses an API, typically exposed through a gateway that concentrates authentication, authorization, and rate limiting; a guarantee proven at the pipeline level does not propagate end-to-end if the API exposing that pipeline is permeable.
 
-Automated API testing does not close this gap. A systematic review of 92 contributions shows that 72 target functional conformance and only 8 address security testing explicitly~\cite{golmohammadiTestingRESTfulAPIs2023}; and even where security is the explicit target, building the evaluation criteria that decide whether an observed behaviour violates a security guarantee remains the least solved problem in test automation~\cite{barrOracleProblemSoftware2015}.
+Automated API testing does not close this gap. Golmohammadi et al. presents a systematic review of 92 contributions shows that only 8 address security testing explicitly~\cite{golmohammadiTestingRESTfulAPIs2023}; and even where security is the explicit target, building the evaluation criteria that decide whether an observed behaviour violates a security guarantee remains the least solved problem in test automation~\cite{barrOracleProblemSoftware2015}.
 
-This work addresses that gap. We propose a contract-driven approach to the security assurance of Big Data service APIs, in which the target's OpenAPI specification governs the construction of syntactically valid probes and the evaluation criterion of each test is derived from the domain knowledge of the security control being exercised, rather than from the syntax of the request or response alone. The approach is organised around three research questions:
+In this paper we propose a contract-driven approach to the security assurance of Big Data service APIs, in which the target's OpenAPI specification governs the construction of syntactically valid probes and the evaluation criterion of each test is derived from the domain knowledge of the security control being exercised, rather than from the syntax of the request or response alone. The approach is organised around three research questions:
 
 \begin{itemize}
-  \item \textbf{RQ1}: Can security guarantees of an API-exposed Big Data service be verified beyond syntactic conformance, using criteria derived from the semantics of the security controls themselves?
+  \item \textbf{RQ1}: Can security guarantees of an API be verified beyond syntactic conformance, using criteria derived from the semantics of the security controls themselves?
   \item \textbf{RQ2}: Can such verification be made deterministic and reproducible across independent executions, so that it can be embedded in a continuous release cycle?
   \item \textbf{RQ3}: Does the resulting approach correctly distinguish enforced from bypassed guarantees on a real target, including anomalies not anticipated in advance?
 \end{itemize}

@@ -4,6 +4,7 @@
 %% ============================================================================
 
 \subsection{Design Principles}
+\label{sec:principles}
 
 Four principles govern the approach.
 
@@ -53,16 +54,17 @@ Domain D5 (Observability) is architecturally provisioned but carries no active t
 \subsection{Specified Oracles for Security Guarantees}
 \label{sec:oracles}
 
-Generating inputs automatically is a largely solved problem; deciding whether the observed behaviour is correct is the structural bottleneck of test automation.
-Barr et al. formalise a test oracle as a partial function $D: T_A \to \mathbb{B}$ mapping a sequence of activities to a verdict, and distribute automation techniques over four categories: \emph{specified} oracles, derived from formal specifications; \emph{derived} oracles, inferred from artefacts such as previous executions; \emph{implicit} oracles, covering universal anomalies such as crashes; and \emph{no-oracle} strategies~\cite{barrOracleProblemSoftware2015}.
+Generating well-formed input is a largely solved problem in test automation. Deciding whether the resulting behaviour is correct is not, and this is exactly the gap identified as \textbf{G2}.
+Barr et al. distinguish four ways this decision can be automated~\cite{barrOracleProblemSoftware2015}. A \emph{specified} oracle derives its criterion from a formal specification. A \emph{derived} oracle infers its criterion from other artefacts, such as past executions. An \emph{implicit} oracle only catches universal anomalies, such as crashes. A \emph{no-oracle} strategy gives up automatic judgement altogether.
+None of these categories, on its own, tells us whether a response violates a \emph{security} guarantee: that judgement needs the domain knowledge of the specific control being checked, not just a generic classification of where the criterion comes from.
 
-We adopt \emph{specified oracles} defined a~priori for every individual test and derived from the domain knowledge of the security control being exercised.
-Building each oracle follows the same three-step procedure: the class of verification is analysed, the relevant failure conditions are identified, and the resulting criterion is encoded in the logic of the corresponding test.
-What varies across tests is only the source from which the criterion is drawn, and that source is determined by the control being verified, not by the target.
+We close this gap by giving every test its own \emph{specified oracle}, built with the same three-step procedure: identify the class of guarantee under verification, determine what a violation of it looks like, and encode the resulting rule directly in the test.
+What changes from test to test is only where that rule comes from; the procedure itself never changes.
 
 Table~\ref{tab:oracles} shows this procedure applied to a set of representative examples across the domains of Table~\ref{tab:domains}.
 Each row reads as follows: \emph{Domain} names the domain from Table~\ref{tab:domains} the guarantee belongs to; \emph{Class of guarantee} names the property being checked; \emph{Source of the criterion} says where the pass/fail rule comes from (i.e., the specification itself, a published external standard, or a comparison of responses across roles); \emph{Verdict rule} gives the concrete condition that makes that specific test fail.
 The same three-step procedure applies to every other test in the suite, not only to the examples shown here.
+Each source encodes something about what the control is supposed to guarantee, rather than a status code or a generic structural check, closing the syntactic blindness identified as \textbf{G1}.
 
 \begin{table}
   \caption{Sources of the evaluation criterion, by class of guarantee, mapped to the domain of Table~\ref{tab:domains} it belongs to.}
@@ -81,43 +83,53 @@ The same three-step procedure applies to every other test in the suite, not only
   \end{tabular}
 \end{table}
 
-Two consequences follow, one operational and one epistemic.
+A fixed criterion has one benefit and one limit.
 
-Operationally, a fixed criterion makes the verdict invariant: the same system, interrogated in the same configuration, always yields the same outcome.
-This is what makes assessments comparable across successive executions and grounds the reproducibility claim empirically rather than by assertion.
-To keep that invariance from producing false positives, every HTTP probe is classified under a three-valued encoding rather than a binary one: \textsc{enforced}, the control works; \textsc{bypassed}, the control is absent or misconfigured; and \textsc{inconclusive}, the response cannot be interpreted with sufficient certainty to justify a finding.
-A \texttt{404} on a parameterised path, for instance, may mean that the gateway rejected the request, that the path does not exist for the value used in the probe, or that the endpoint is genuinely unprotected but the path was wrong; treating it uniformly as a failure would make the assessment unusable.
+The benefit is operational. Because the criterion never changes, the same system probed under the same configuration always produces the same verdict, and this is what lets Section~\ref{sec:eval} treat two independent runs as comparable measurements rather than two unrelated observations.
 
-Epistemically, the correctness of the verdicts is conditional on the correctness of the contract taken as reference.
-A specification that is incomplete reduces the observable surface without the process being able to detect it; a specification that is contractually wrong produces evaluations grounded in a wrong oracle.
-We return to this limit in Section~\ref{sec:threats}, and Section~\ref{sec:discrepancy} reports a concrete instance of it.
+The limit is epistemic. A verdict is only as correct as the contract it is checked against.
+An incomplete specification hides an endpoint from the assessment with no way to detect the omission; a specification that misstates a requirement makes the tool praise or blame the target for the wrong reason.
+Section~\ref{sec:threats} returns to this limit, and Section~\ref{sec:discrepancy} reports a concrete instance of it.
+
+Application agnosticism (Section~\ref{sec:principles}) and these specified oracles together let the tool carry its portability across targets without leaving its security-aware evaluation logic behind, closing \textbf{G3} by no longer trading depth for reach.
 
 \subsection{Privilege-Aware Coverage}
 
-Some guarantees are physically unreachable without a specific level of privilege, and that inaccessibility -- not a retroactive label -- is what determines the visibility level of a test.
-Perimeter controls that the gateway applies to any interlocutor presuppose no knowledge of the internal infrastructure, and executing them without credentials is the only way to obtain evidence uncontaminated by implicit privileges: these are \texttt{BLACK\_BOX} tests, requiring network access alone.
-An RBAC authorization control requires the system to be in an authenticated state under at least two distinct role identities, because the defect emerges only from comparing what two identities obtain on the same resource: these are \texttt{GREY\_BOX} tests.
-Guarantees that reside in the static configuration of the gateway are verifiable only by direct inspection of its control plane, since no response on the exposed endpoints carries that information: these are \texttt{WHITE\_BOX} tests.
+Each test requires a specific level of access to the target, and that requirement determines its strategy.
 
-Each test declares its strategy as fixed metadata, so assessment depth adapts to the preconditions actually available in a given organisational context without requiring different versions of the tool: the variation lives in the configuration file, not in a mode switch.
+\texttt{BLACK\_BOX} tests need network access alone.
+They check perimeter controls that the gateway applies to any caller, so probing them without credentials is the only way to see the system as an external attacker would, uncontaminated by any implicit privileges.
+
+\texttt{GREY\_BOX} tests need valid credentials for at least two distinct roles.
+An RBAC check, for example, can only surface a defect by comparing what two identities are allowed to do on the same resource; a single authenticated identity cannot reveal a segregation failure.
+
+\texttt{WHITE\_BOX} tests need direct access to the gateway's administrative configuration plane.
+Some guarantees, such as whether a security header is enforced by policy, leave no trace in the responses an external caller sees, and can only be verified by reading the configuration directly.
+
+Each test declares its required strategy as fixed metadata; the tool itself does not choose a mode.
+What changes across deployments is the configuration file. When credentials for two roles or admin access to the gateway are unavailable, the corresponding tests are skipped with an explicit reason, and coverage narrows accordingly without any change to the tool.
 
 \subsection{Deterministic Assessment Engine}
 
-The assessment unfolds in seven sequential phases with differentiated error semantics.
-The first four are blocking: initialisation, which validates the configuration and resolves credentials; retrieval and validation of the OpenAPI specification, which builds the map of exposed endpoints; construction of the execution contexts, which assembles the immutable target knowledge and the mutable runtime state; and discovery and scheduling of the tests, which resolves declared dependencies into an execution order.
-A failure in any of these four halts the process before any test runs.
-The last three are non-blocking: execution, which runs each test in the scheduled order; teardown, which reverses the resources any test created in last-in-first-out order; and reporting, which aggregates outcomes into machine-readable artefacts.
-An error in any of them is isolated as a structured result, and the process continues.
+The assessment runs as seven phases, split into two groups with different failure semantics.
 
-Tests declare their dependencies explicitly, and a scheduler resolves them topologically into batches, each grouping the tests whose prerequisites were satisfied in the preceding batches.
-This structure does more than establish an order: its purpose is semantic correctness.
-A test that verifies token revocation presupposes that authentication has already been confirmed and a valid token acquired, and without a declared dependency the test's outcome would depend on execution order rather than on the target's actual behaviour.
-Cycles in the declared dependencies are detected statically, before any test runs, and block the assessment before it starts.
-A separate stall guard protects against a rarer failure mode: even in an acyclic graph, the scheduler can reach a state where tests remain but none of them is ready; when this happens, the guard reports the exact set of tests that could never be scheduled, rather than failing with a generic error.
+The first four phases are blocking: reading the configuration, retrieving and validating the OpenAPI specification, building the execution context, and scheduling the tests.
+A failure in any of them stops the process before a single test runs, because nothing downstream can be trusted otherwise.
 
-Determinism is obtained by the conjunction of four mechanisms: a configuration that fixes every decisional parameter, so that the process has no endogenous sources of variation; a topological resolution that always produces the same batch sequence; a lexicographic ordering of the tests within each batch, which is the only source of a total order among tests that are ready at the same level; and the fixed oracles of Section~\ref{sec:oracles}.
-Timestamps and record identifiers vary by nature; what must be invariant are the aggregate counters, the per-test verdicts, and the distribution of findings across domains.
+The last three phases are non-blocking: running the tests, cleaning up, and producing the report.
+A failure in one test is recorded as a structured result and execution continues, so a single broken test cannot silently invalidate the rest of the run.
 
-Finally, the process terminates with one of four semantically distinct exit codes: \texttt{0} when every active test passed or was skipped; \texttt{1} when at least one violation was detected; \texttt{2} when no violation was detected but at least one test produced an internal error; and \texttt{10} on an infrastructural error that prevented execution.
-Because the codes are semantically distinct, a CI/CD pipeline can route on the exit code alone, without parsing logs: a violation (\texttt{1}) calls for analysing and correcting the target, while an infrastructural error (\texttt{10}) calls for diagnosing the assessment's own deployment.
+Tests can declare a dependency on other tests, and a scheduler resolves these dependencies into a topological execution order before anything runs.
+This is a semantic correctness requirement: a test that checks token revocation only makes sense once a test confirming that authentication works has already produced a valid token, and running it earlier would make its outcome depend on scheduling order rather than on the target's actual behaviour.
+Dependency cycles are caught statically, before execution starts.
+A separate check also guards against the rarer case in which the scheduler reaches a deadlock despite an acyclic graph, reporting the exact set of tests that could not be run rather than failing with a generic error.
 
+Determinism (\textbf{G4}) follows from four mechanisms acting together.
+A configuration file fixes every parameter the tool could otherwise decide on its own, leaving no source of variation internal to the tool.
+The scheduling order depends only on declared dependencies, never on chance.
+A lexicographic ordering breaks ties between tests that become ready at the same time.
+The oracles of Section~\ref{sec:oracles} are fixed in advance.
+What is allowed to vary between runs, such as timestamps and internal record identifiers, has no bearing on what matters: the aggregate counts, the per-test verdicts, and the findings.
+
+The process ends with one of four semantically distinct exit codes, which separate success from failure and distinguish different kinds of failure from one another.
+This lets a CI/CD pipeline react automatically, routing a security violation to whoever owns the target and an infrastructural problem to whoever maintains the assessment's own deployment, without anyone having to read the logs first.

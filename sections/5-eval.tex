@@ -1,3 +1,4 @@
+% !TEX root = ../main.tex
 %% ============================================================================
 \section{Experimental Evaluation}
 \label{sec:eval}
@@ -5,8 +6,8 @@
 
 \subsection{Testbed}
 
-The target environment was selected from the coverage matrix of the test suite: we needed an application with a natively generated OpenAPI specification rather than one reconstructed after the fact, endpoints protected by real authentication, at least two distinct privilege levels, parameterised endpoints with resolvable path values, and behaviour that remains stable across successive runs.
-Forgejo~14.0.3~\cite{forgejoContributors2026}, a self-hosted Git service exposing repositories, users, tokens, and webhooks through a documented REST API, satisfies all of them, and instantiates the repository service of the reference scenario of Section~\ref{sec:scenario}.
+We use Forgejo~14.0.3~\cite{forgejoContributors2026} as the target, instantiating the repository service of the reference scenario of Section~\ref{sec:scenario}.
+Forgejo is a self-hosted Git service exposing repositories, users, tokens, and webhooks through a REST API documented by a natively generated OpenAPI specification, with real authentication, two distinct privilege levels, and parameterised endpoints with resolvable path values.
 
 Forgejo is exposed through Kong~3.9~\cite{kongGateway2026} in DB-less mode, with PostgreSQL~15-alpine as Forgejo's persistence backend; an ephemeral container provisions three accounts at first start -- an administrator and two ordinary users -- and terminates.
 All services run in a dedicated Docker network declared in a single Compose file, on a development host, without dedicated hardware.

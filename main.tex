@@ -162,13 +162,13 @@ The remainder of the paper is organised as follows. Section~\ref{sec:related} di
 
 
 %% ============================================================================
-\section{Related Work}
+\section{Related Work and Gaps}
 \label{sec:related}
 %% ============================================================================
 
-Two lines of work meet in this paper: assurance of Big Data systems, and automated testing of REST APIs.
+%Two lines of work meet in this paper: assurance of Big Data systems, and automated testing of REST APIs.
 
-\paragraph{Assurance of Big Data systems.}
+%\paragraph{Assurance of Big Data systems.}
 The trustworthiness of Big Data computations has been addressed as a property of the pipeline, of the ecosystem of services executing it, and of the data it governs.
 Anisetti et al. propose an assurance process that jointly evaluates a Big Data pipeline and its underlying ecosystem, annotating pipeline templates with non-functional requirements and computing an aggregate trustworthiness confidence level, validated on a Big-Data-Analytics-as-a-Service platform~\cite{anisettiAssuranceProcessBig2023}.
 Ardagna et al. address the same problem through service-level agreements, negotiating and monitoring contractual guarantees, such as data integrity and availability, between the parties of a Big-Data-Analytics-as-a-Service deployment~\cite{ardagnaBigDataAssurance2023}.
@@ -177,13 +177,13 @@ At the data governance level, access control has been enforced at ingestion time
 These contributions target the pipeline, the ecosystem executing it, and the data governed within it; none addresses the REST interface through which every access to that pipeline and that data actually takes place, an assumption on which their own guarantees implicitly rely.
 That assumption is what we make verifiable.
 
-\paragraph{Automated testing of REST APIs.}
-A systematic review of 92 contributions published between 2009 and 2022~\cite{golmohammadiTestingRESTfulAPIs2023} shows that the field concentrated on system testing, understood as verifying that the API responds correctly and respects the declared formats: 72 of the 92 papers fall in this category.
-Security testing is addressed explicitly by 8 papers and listed as an open challenge by 10 more.
-Du et al. quantify the consequence: across stateful REST fuzzers, only 2--5\% of the detected HTTP~500 faults correspond to actual security vulnerabilities~\cite{duVulnerabilityorientedTestingRESTful2024}.
+%\paragraph{Automated testing of REST APIs.}
+%A systematic review of 92 contributions published between 2009 and 2022~\cite{golmohammadiTestingRESTfulAPIs2023} shows that the field concentrated on system testing, understood as verifying that the API responds correctly and respects the declared formats: 72 of the 92 papers fall in this category.
+%Security testing is addressed explicitly by 8 papers and listed as an open challenge by 10 more.
+Considering the automated testing of REST APIs, it still in its infancy and is considered as an open challenge. Du et al. identified that just 2--5\% of the detected HTTP~500 faults correspond to actual security vulnerabilities~\cite{duVulnerabilityorientedTestingRESTful2024}.
 
-The contract-driven line replaces syntactic heuristics with knowledge of the formal specification.
-RESTler infers producer--consumer dependencies from the OpenAPI specification and generates stateful request sequences; its oracle is the HTTP~500 status code, which the authors acknowledge cannot reach vulnerabilities that do not manifest through status codes~\cite{atlidakisRESTlerStatefulREST2019a}.
+The contract-driven line of research is focused on replacing syntactic heuristics with knowledge of the formal specification.
+RESTler infers producer, consumer dependencies from the OpenAPI specification, and generates stateful request sequences. Its oracle is the HTTP~500 status code, which the authors acknowledge cannot reach vulnerabilities that do not manifest through status codes~\cite{atlidakisRESTlerStatefulREST2019a}.
 Atlidakis et al. extend it with four formal security rules and active property checkers~\cite{atlidakisCheckingSecurityProperties2020}; NAUTILUS orients the paradigm towards injection-class vulnerabilities requiring ordered operation sequences~\cite{dengNAUTILUSAutomatedRESTful2023}; Schemathesis derives a structured set of conformance properties from the specification and from RFC~7231~\cite{schemathesisDerivingSemanticsawareFuzzers2022}.
 A distinct direction automates the construction of the oracle itself, dynamically from observed request/response pairs~\cite{alonsoAGORAAutomatedGeneration2023, alonsoAgora+TestOracleGeneration2025} or statically from the specification~\cite{alonsoSATORIStaticTest2025}; both operate in the domain of functional conformance.
 Closest to our objective, Sahin et al. propose nine automated oracles for authorization, authentication, and injection faults, applied as a post-processing phase over an existing fuzzer~\cite{sahinEnhancingRESTAPI2026}; the approach is confined to the application layer and does not cover the configuration of the gateway that fronts the service.
@@ -208,15 +208,18 @@ Table~\ref{tab:related} summarises how these approaches use the specification an
   \end{tabular}
 \end{table}
 
-The approaches above already expose two of the four gaps that motivate this work.
-The first is a syntactic blindness: what each tool checks, summarised in Table~\ref{tab:related}, is either a status code, a structural property of the response, or a fault class mined or authored independently of the target's security semantics; none of them evaluates whether a syntactically valid request violates the access rules the system is supposed to enforce.
-The second, most structural, is the absence of evaluation criteria for security guarantees: deciding automatically whether an observed behaviour violates such a guarantee requires a criterion that the interface specification alone cannot supply, since it depends on the domain knowledge of the control being exercised.
-Barr et al. survey this as the oracle problem, and identify the automated construction of such criteria as the bottleneck of test automation~\cite{barrOracleProblemSoftware2015}. AGORA/AGORA+ and SATORI build oracles explicitly, but mine or infer them from observed traffic or from the contract alone, targeting functional conformance rather than security semantics; Sahin et al. come closer, authoring nine fixed oracles for authorization, authentication, and injection faults, but the result is a closed set confined to the application layer, not a methodology that extends to new domains or to the gateway's own configuration.
+%The approaches above already expose two of the four gaps that motivate this work.
+Given the current related work the following gaps emerge:
+Syntactic blindness (\textbf{G1}): what each tool checks, summarised in Table~\ref{tab:related}, is either a status code, a structural property of the response, or a fault class mined or authored independently of the target's security semantics; none of them evaluates whether a syntactically valid request violates the access rules the system is supposed to enforce.
+The absence of evaluation criteria for security guarantees (\textbf{G2}): deciding automatically whether an observed behaviour violates such a guarantee requires a criterion that the interface specification alone cannot supply, since it depends on the domain knowledge of the control being exercised.
+Barr et al. survey this as the oracle problem, and identify the automated construction of such criteria as the bottleneck of test automation~\cite{barrOracleProblemSoftware2015}. AGORA/AGORA+ and SATORI build oracles explicitly, but mine or infer them from observed traffic or from the contract alone, targeting functional conformance rather than security semantics. Sahin et al. come closer, authoring nine fixed oracles for authorization, authentication, and injection faults, but the result is a closed set confined to the application layer, not a methodology that extends to new domains or to the gateway's own configuration \cite{sahinEnhancingRESTAPI2026}.
 
-Two further gaps remain.
-Tools that are portable across targets use the specification to generate syntactically valid requests but not to judge whether responses respect the declared security contract, while tools that reach semantic depth are anchored to a single platform.
-And the absence of deterministic execution prevents results from being compared across successive runs, which is the precondition for embedding verification in a continuous release cycle.
+%Two further gaps remain.
+%Tools that are portable across targets use the specification to generate syntactically valid requests but not to judge whether responses respect the declared security contract, while tools that reach semantic depth are anchored to a single platform.
+%And the absence of deterministic execution prevents results from being compared across successive runs, which is the precondition for embedding verification in a continuous release cycle.
+Lack of Security Contract Validation in Cross-Target Tools (\textbf{G3}): Portable tools can leverage specifications to generate syntactically valid requests across different targets, but they do not verify whether the corresponding responses comply with the security properties declared in those specifications. As a result, portability is achieved at the expense of security-aware semantic validation.
 
+Absence of Deterministic Execution for Continuous Verification (\textbf{G4}): Existing approaches lack deterministic execution, leading to variations in results across successive runs. This prevents reliable comparison of outcomes over time and hinders the integration of automated verification into continuous release and deployment pipelines.
 
 
 %% ============================================================================
@@ -224,17 +227,27 @@ And the absence of deterministic execution prevents results from being compared 
 \label{sec:scenario}
 %% ============================================================================
 
-We consider the development and delivery of Big Data pipelines.
-In this scenario, pipeline code, deployment descriptors, build artefacts, and the webhooks that trigger orchestration are managed by a \emph{repository service} that data engineers from different tenants use to upload, version, and activate their pipelines.
-The service is exposed as a REST API behind an API gateway, which concentrates authentication, authorization, and rate limiting on a single, inspectable configuration plane and constitutes the boundary between clients and internal services~\cite{roseZeroTrustArchitecture2020}.
+%We consider the development and delivery of Big Data pipelines.
+%In this scenario, pipeline code, deployment descriptors, build artefacts, and the webhooks that trigger orchestration are managed by a \emph{repository service} that data engineers from different tenants use to upload, version, and activate their pipelines.
+%The service is exposed as a REST API behind an API gateway, which concentrates authentication, authorization, and rate limiting on a single, inspectable configuration plane and constitutes the boundary between clients and internal services~\cite{roseZeroTrustArchitecture2020}.
 
-This service belongs to the trust perimeter of the pipelines it hosts, and its API is where that perimeter is enforced.
-A broken object-level authorization check on that API exposes the code and configuration of another tenant's pipeline; an unverified webhook lets an unauthorised party trigger a pipeline execution; an endpoint that responds without credentials while the published specification declares it protected invalidates the assumptions that consumers of that service legitimately make.
-None of these failures is visible to an assessment conducted one level below, on the pipeline or on the infrastructure: the requests that realise them are syntactically impeccable, and four of the top five categories of the OWASP API Security Top~10 belong to this class~\cite{OWASPTop10}.
-NIST SP~800-228 formalises the same limit for cloud-native APIs, observing that payload-level defences cannot operate at the semantic level of the interface, and prescribing a formal specification with declared request and response schemas as a precondition for any automated verification~\cite{chandramouliGuidelinesAPIProtection2026}.
+%This service belongs to the trust perimeter of the pipelines it hosts, and its API is where that perimeter is enforced.
+%A broken object-level authorization check on that API exposes the code and configuration of another tenant's pipeline; an unverified webhook lets an unauthorised party trigger a pipeline execution; an endpoint that responds without credentials while the published specification declares it protected invalidates the assumptions that consumers of that service legitimately make.
+%None of these failures is visible to an assessment conducted one level below, on the pipeline or on the infrastructure: the requests that realise them are syntactically impeccable, and four of the top five categories of the OWASP API Security Top~10 belong to this class~\cite{OWASPTop10}.
 
-The assurance problem we address is therefore the following: given a service of this kind, described by an OpenAPI specification and exposed through a gateway, decide automatically and reproducibly whether the security guarantees its contract declares are actually enforced.
+%NIST SP~800-228 formalises the same limit for cloud-native APIs, observing that payload-level defences cannot operate at the semantic level of the interface, and prescribing a formal specification with declared request and response schemas as a precondition for any automated verification~\cite{chandramouliGuidelinesAPIProtection2026}.
 
+%The assurance problem we address is therefore the following: given a service of this kind, described by an OpenAPI specification and exposed through a gateway, decide automatically and reproducibly whether the security guarantees its contract declares are actually enforced.
+
+We consider a Big Data platform in which data scientist design, deploy, and operate data-processing pipelines on behalf of multiple tenants. The lifecycle of these pipelines includes source-code development, artefact generation, deployment configuration, execution triggering, and version management. To support these activities, the platform exposes a \emph{repository service} that allows for storing, versioning, publishing, and activating pipelines. Pipeline code, deployment descriptors, build artefacts, and the orchestration are all managed through this service.
+
+The repository service is exposed through a REST API protected by an API gateway. The gateway centralizes authentication, authorization, and rate-limiting policies, providing a single and inspectable control point where all the external requests are enforced~\cite{roseZeroTrustArchitecture2020}. This sevice API constitutes the main trust boundary between clients and the internal components responsible for the big data pipeline storage, deployment, and execution. The correctness of its interface-level security controls directly impacts the security of the entire platform. For example, a broken object-level authorization mechanism may allow one tenant to access the source code or configuration of another tenant's pipeline. Similarly, an improperly protected hook endpoint may enable unauthorized triggering of pipeline executions, while an endpoint that accepts requests without authentication despite being specified as protected violates the security assumptions made by service consumers. 
+We note that these vulnerabilities that emerge at the semantic level of the API contract, are largelly not addressed by traditional assessments focused mostly on the lowest layers involving pipeline code, runtime infrastructure, or network configuration.
+Recent guidance, such as NIST SP 800-228, highlights the same limitation for cloud-native APIs, noting that payload-level and infrastructure-level protections cannot reason about the semantic correctness of API behavior~\cite{chandramouliGuidelinesAPIProtection2026}. 
+
+In our scenario we assume that the API of the repository service is accompanied by a formal machine-readable specification (i.e., OpenAPI) that explicitly defines operations, request and response schemas, and security requirements.
+
+In this context the assurance problem addressed in this paper is the following. Given a Big Data repository service described by an OpenAPI specification and exposed through an API gateway, determine automatically whether the security guarantees declared in its API contract are actually enforced by the deployed implementation.
 
 
 %% ============================================================================
@@ -296,7 +309,7 @@ Generating inputs automatically is a largely solved problem; deciding whether th
 Barr et al. formalise a test oracle as a partial function $D: T_A \to \mathbb{B}$ mapping a sequence of activities to a verdict, and distribute automation techniques over four categories: \emph{specified} oracles, derived from formal specifications; \emph{derived} oracles, inferred from artefacts such as previous executions; \emph{implicit} oracles, covering universal anomalies such as crashes; and \emph{no-oracle} strategies~\cite{barrOracleProblemSoftware2015}.
 
 We adopt \emph{specified oracles} defined a~priori for every individual test and derived from the domain knowledge of the security control being exercised.
-The methodological procedure is uniform: the class of verification is analysed, the relevant failure conditions are identified, and the criterion is encoded in the logic of the corresponding test.
+The methodological procedure is uniform. The class of verification is analysed, the relevant failure conditions are identified, and the criterion is encoded in the logic of the corresponding test.
 What varies is the source from which the criterion is drawn, and that source is determined by the control, not by the target.
 Table~\ref{tab:oracles} illustrates this mapping with representative tests drawn from across the eight domains; the same procedure applies uniformly to every test in the suite.
 
@@ -424,9 +437,8 @@ This is the concrete demonstration of the application agnosticism claimed in Sec
 
 \subsection{Experimental Design}
 
-Validating an assessment approach against a correctly configured environment would produce a suite of uniform successes: a tautological result that demonstrates nothing about the ability to detect real violations.
-The testbed is therefore configured so that some tests yield expected failures and others yield expected successes, and the combination constitutes a functionally complete bench on which the approach must distinguish the two.
-
+%Validating an assessment approach against a correctly configured environment would produce a suite of uniform successes: a tautological result that demonstrates nothing about the ability to detect real violations.
+The testbed is configured so that some tests yield expected failures and others yield expected successes, and the combination constitutes a functionally complete bench on which the approach must distinguish the two.
 The testbed combines deliberately engineered conditions with Forgejo's and Kong's behaviour as deployed, which the testbed does not control and cannot predict in advance.
 Some conditions were deliberately broken to produce expected failures: for instance, Kong's rate-limiting plugin is disabled, a recurrent condition in non-production environments where throttling interferes with application testing, and the TLS certificate is self-signed, which by construction exhibits configurations below production baselines.
 Others were deliberately configured to produce expected successes: for instance, a response transformer injects the HTTP security headers on every response, and a dedicated service enforces the HTTP-to-HTTPS redirect.
@@ -548,10 +560,12 @@ On the research side, the formalisation of security oracles remains open: the ap
 %% identification of the section in the article metadata, and the
 %% consistent spelling of the heading.
 \begin{acknowledgments}
-  Thanks to the developers of ACM consolidated LaTeX styles
-  \url{https://github.com/borisveytsman/acmart} and to the developers
-  of Elsevier updated \LaTeX{} templates
-  \url{https://www.ctan.org/tex-archive/macros/latex/contrib/els-cas-templates}.
+ The work was partially supported by Universita degli Studi di Milano via the program “piano sostegno alla ricerca”.
+ 
+  % Thanks to the developers of ACM consolidated LaTeX styles
+ % \url{https://github.com/borisveytsman/acmart} and to the developers
+ % of Elsevier updated \LaTeX{} templates
+ % \url{https://www.ctan.org/tex-archive/macros/latex/contrib/els-cas-templates}.
 \end{acknowledgments}
 
 %% The declaration on generative AI comes in effect

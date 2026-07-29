@@ -125,9 +125,8 @@ The case also illustrates concretely the epistemic limit of Section~\ref{sec:ora
 \subsection{Determinism, Idempotence, and Footprint}
 
 The assessment was executed twice in sequence against the same testbed, with no manual intervention between the runs.
-Table~\ref{tab:kpi} reports the aggregate indicators.
-Finding counters, per-test statuses, exit code, and pass rate are byte-identical across the two runs: the deterministic part of the result exhibits no variation.
-The wall-clock delta is 0.23\%, which falls within the expected fluctuation of HTTP latency towards the target and is not attributable to non-deterministic behaviour of the process.
+Both runs produced 9~PASS, 7~FAIL, 2~SKIP, and 0~ERROR, with 98 findings, a 56.2\% pass rate, and exit code~1.
+Wall-clock duration was 290.14~s in the first run and 290.81~s in the second, a 0.23\% difference consistent with ordinary fluctuation in HTTP latency towards the target rather than with non-deterministic behaviour of the process.
 
 Teardown is the precondition of idempotence: without a complete cleanup of the resources created during the first execution, the second would encounter an altered state and produce different results.
 Verification after each run confirmed that the teardown phase drained the LIFO registry with no residual resources, leaving no tokens and no repositories created by the assessment on the target accounts.
@@ -136,25 +135,6 @@ The execution profile qualifies operational integrability.
 Of approximately 290~seconds of wall-clock time, the process consumed about 35~seconds of CPU in user space and 41~seconds in kernel space: 26\% of the total.
 The remaining 214~seconds were spent waiting for HTTP responses, for the completion of external analysers, and for disk I/O.
 The regime is dominated by network latency, so optimising the implementation would have marginal impact; the significant reduction would come from parallelising tests within the same batch that have no mutual dependencies, an extension left to future work.
-
-\begin{table}
-  \caption{Aggregate indicators over two independent runs, and execution profile.}
-  \label{tab:kpi}
-  %% SOURCE: merge Tesi/assets/tables/5-idempotenza-kpi.tex and
-  %% 5-performance-baseline.tex into a single table.
-  \begin{tabular}{lrr}
-    \toprule
-    \textbf{Indicator}         & \textbf{Run 1} & \textbf{Run 2} \\
-    \midrule
-    PASS / FAIL / SKIP / ERROR & 9/7/2/0        & 9/7/2/0        \\
-    Total findings             & 98             & 98             \\
-    Pass rate (\%)             & 56.2           & 56.2           \\
-    Exit code                  & 1              & 1              \\
-    Duration (s)               & 290.14         & 290.81         \\
-    Residual resources         & 0              & 0              \\
-    \bottomrule
-  \end{tabular}
-\end{table}
 
 \subsection{Threats to Validity}
 \label{sec:threats}

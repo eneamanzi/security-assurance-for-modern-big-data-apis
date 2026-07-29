@@ -57,23 +57,26 @@ Generating inputs automatically is a largely solved problem; deciding whether th
 Barr et al. formalise a test oracle as a partial function $D: T_A \to \mathbb{B}$ mapping a sequence of activities to a verdict, and distribute automation techniques over four categories: \emph{specified} oracles, derived from formal specifications; \emph{derived} oracles, inferred from artefacts such as previous executions; \emph{implicit} oracles, covering universal anomalies such as crashes; and \emph{no-oracle} strategies~\cite{barrOracleProblemSoftware2015}.
 
 We adopt \emph{specified oracles} defined a~priori for every individual test and derived from the domain knowledge of the security control being exercised.
-The methodological procedure is uniform. The class of verification is analysed, the relevant failure conditions are identified, and the criterion is encoded in the logic of the corresponding test.
-What varies is the source from which the criterion is drawn, and that source is determined by the control, not by the target.
-Table~\ref{tab:oracles} illustrates this mapping with representative tests drawn from across the eight domains; the same procedure applies uniformly to every test in the suite.
+Building each oracle follows the same three-step procedure: the class of verification is analysed, the relevant failure conditions are identified, and the resulting criterion is encoded in the logic of the corresponding test.
+What varies across tests is only the source from which the criterion is drawn, and that source is determined by the control being verified, not by the target.
+
+Table~\ref{tab:oracles} shows this procedure applied to a set of representative examples across the domains of Table~\ref{tab:domains}.
+Each row reads as follows: \emph{Domain} names the domain from Table~\ref{tab:domains} the guarantee belongs to; \emph{Class of guarantee} names the property being checked; \emph{Source of the criterion} says where the pass/fail rule comes from (i.e., the specification itself, a published external standard, or a comparison of responses across roles); \emph{Verdict rule} gives the concrete condition that makes that specific test fail.
+The same three-step procedure applies to every other test in the suite, not only to the examples shown here.
 
 \begin{table}
-  \caption{Sources of the evaluation criterion, by class of guarantee.}
+  \caption{Sources of the evaluation criterion, by class of guarantee, mapped to the domain of Table~\ref{tab:domains} it belongs to.}
   \label{tab:oracles}
-  \begin{tabular}{p{0.20\textwidth} p{0.33\textwidth} p{0.39\textwidth}}
+  \begin{tabular}{p{0.05\textwidth} p{0.17\textwidth} p{0.30\textwidth} p{0.36\textwidth}}
     \toprule
-    \textbf{Class of guarantee}     & \textbf{Source of the criterion}                                             & \textbf{Verdict rule (example)}                                                                              \\
+    \textbf{D.} & \textbf{Class of guarantee}     & \textbf{Source of the criterion}                                             & \textbf{Verdict rule (example)}                                                                              \\
     \midrule
-    Attack-surface conformance      & Set difference between responding and documented endpoints                   & an endpoint that responds without being declared is a shadow API                                             \\
-    Response structural conformance & Contractual schema declared in the specification                             & a field present in the response but absent from the declared schema is a violation                           \\
-    Protocol-level requirements     & Published technical standards                                                & a deprecated endpoint returning neither \texttt{410 Gone} nor a \texttt{Sunset} header is a violation        \\
-    Authentication enforcement      & \texttt{security} markers of the specification, plus credential-less probing & a \texttt{2xx} response to an unauthenticated request on an endpoint declared as protected is a bypass       \\
-    Authorization                   & Comparison of responses obtained with credentials of distinct roles          & a resource of one role readable with the credentials of another is a violation                               \\
-    Infrastructural guarantees      & Direct inspection of the gateway configuration plane                         & the absence of a required security header (e.g. HSTS) in the gateway's declared configuration is a violation \\
+    D0          & Attack-surface conformance      & Set difference between responding and documented endpoints                   & an endpoint that responds without being declared is a shadow API                                             \\
+    D0          & Protocol-level requirements     & Published technical standards                                                & a deprecated endpoint returning neither \texttt{410 Gone} nor a \texttt{Sunset} header is a violation        \\
+    D1          & Authentication enforcement      & \texttt{security} markers of the specification, plus credential-less probing & a \texttt{2xx} response to an unauthenticated request on an endpoint declared as protected is a bypass       \\
+    D2          & Response structural conformance & Contractual schema declared in the specification                             & a field present in the response but absent from the declared schema is a violation                           \\
+    D2          & Authorization                   & Comparison of responses obtained with credentials of distinct roles          & a resource of one role readable with the credentials of another is a violation                               \\
+    D6          & Infrastructural guarantees      & Direct inspection of the gateway configuration plane                         & the absence of a required security header (e.g. HSTS) in the gateway's declared configuration is a violation \\
     \bottomrule
   \end{tabular}
 \end{table}

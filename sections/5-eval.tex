@@ -1,0 +1,168 @@
+%% ============================================================================
+\section{Experimental Evaluation}
+\label{sec:eval}
+%% ============================================================================
+
+\subsection{Testbed}
+
+The target environment was selected from the coverage matrix of the test suite: we needed an application with a natively generated OpenAPI specification rather than one reconstructed after the fact, endpoints protected by real authentication, at least two distinct privilege levels, parameterised endpoints with resolvable path values, and behaviour that remains stable across successive runs.
+Forgejo~14.0.3~\cite{forgejoContributors2026}, a self-hosted Git service exposing repositories, users, tokens, and webhooks through a documented REST API, satisfies all of them, and instantiates the repository service of the reference scenario of Section~\ref{sec:scenario}.
+
+Forgejo is exposed through Kong~3.9~\cite{kongGateway2026} in DB-less mode, with PostgreSQL~15-alpine as Forgejo's persistence backend; an ephemeral container provisions three accounts at first start -- an administrator and two ordinary users -- and terminates.
+All services run in a dedicated Docker network declared in a single Compose file, on a development host, without dedicated hardware.
+Figure~\ref{fig:testbed} shows the topology.
+Kong exposes three ports: plain HTTP for the redirect test, HTTPS with a locally generated self-signed certificate as the primary endpoint, and the Admin API supplying configuration data to the \texttt{WHITE\_BOX} tests.
+DB-less mode matters for validation: the configuration lives entirely in a version-controlled file mounted read-only and cannot be altered at runtime, which guarantees that the gateway state is identical at every start.
+
+Because the implementation contains no reference to Forgejo, changing target means updating the configuration file -- gateway URL, specification path, path seeds, credentials -- not modifying code.
+This is the concrete demonstration of the application agnosticism claimed in Section~\ref{sec:method}.
+
+\begin{figure}[t]
+  \centering
+  \begin{adjustbox}{max width=\columnwidth}
+    \begin{tikzpicture}[
+        node distance=4ex and 2.5em,
+        cls/.style={draw, rounded corners=1pt, inner sep=5pt, align=center, font=\small, minimum height=3.5ex},
+        host/.style={cls, fill=orange!10, draw=orange!50, minimum width=13.5em},
+        infra/.style={cls, fill=blue!7, draw=blue!40, minimum width=13.5em},
+        app/.style={cls, fill=green!7, draw=green!45, minimum width=9em},
+        backend/.style={cls, fill=gray!8, draw=gray!50, minimum width=9em},
+        users/.style={cls, fill=gray!8, draw=gray!50, minimum width=9em},
+        group/.style={draw=gray!60, fill=gray!3, dashed, inner sep=12pt, rounded corners=3pt},
+        arr/.style={-latex, semithick, gray!80!black},
+        darr/.style={-latex, semithick, dashed, gray!80!black},
+        barr/.style={latex-latex, semithick, gray!80!black},
+      ]
+
+      \node[host] (host) {\textbf{Host: apiguard-assurance}\\{\footnotesize Python process, \texttt{apiguard run}}};
+
+      \node[infra, below=7ex of host] (kong) {\textbf{Kong~3.9 DB-less}\\{\footnotesize :8000 (HTTP proxy)}\\{\footnotesize :8443 (HTTPS proxy)}\\{\footnotesize :8001 (Admin API)}};
+
+      \node[app, right=2.5em of kong] (forgejo) {\textbf{Forgejo~14.0.3}\\{\footnotesize target application}};
+
+      \node[users, left=2.5em of kong] (rbac) {\textbf{RBAC users}\\{\footnotesize thesis-admin}\\{\footnotesize user-a}\\{\footnotesize user-b}};
+
+      \node[backend, below=4ex of forgejo] (pg) {\textbf{PostgreSQL}\\{\footnotesize Forgejo backend}};
+
+      \begin{scope}[on background layer]
+        \node[group, fit=(kong)(forgejo)(pg)] (compose) {};
+      \end{scope}
+      \node[font=\footnotesize\bfseries, text=gray!70!black, anchor=south west, xshift=1ex, yshift=0.5ex] at (compose.south west) {Docker Compose network};
+
+      \draw[arr] (host.south) -- node[pos=0.35, right, align=left, font=\footnotesize\itshape, text=gray!70!black] {:8000/:8443 probe \\ :8001 Admin API} (kong.north);
+
+      \draw[arr] (kong.east) -- node[midway, above, align=center, font=\footnotesize\itshape, text=gray!70!black] {proxy/ \\route} (forgejo.west);
+
+      \draw[barr] (forgejo.south) -- node[midway, right, font=\footnotesize\itshape, text=gray!70!black] {SQL} (pg.north);
+
+      \draw[darr] (rbac.east) -- node[midway, above, font=\footnotesize\itshape, text=gray!70!black] {token} (kong.west);
+
+    \end{tikzpicture}
+  \end{adjustbox}
+  \caption{Topology of the experimental testbed: Kong~3.9 routes traffic between the tool and Forgejo~14.0.3, backed by PostgreSQL.}
+  \label{fig:testbed}
+\end{figure}
+
+\subsection{Experimental Design}
+
+%Validating an assessment approach against a correctly configured environment would produce a suite of uniform successes: a tautological result that demonstrates nothing about the ability to detect real violations.
+The testbed is configured so that some tests yield expected failures and others yield expected successes, and the combination constitutes a functionally complete bench on which the approach must distinguish the two.
+The testbed combines deliberately engineered conditions with Forgejo's and Kong's behaviour as deployed, which the testbed does not control and cannot predict in advance.
+Some conditions were deliberately broken to produce expected failures: for instance, Kong's rate-limiting plugin is disabled, a recurrent condition in non-production environments where throttling interferes with application testing, and the TLS certificate is self-signed, which by construction exhibits configurations below production baselines.
+Others were deliberately configured to produce expected successes: for instance, a response transformer injects the HTTP security headers on every response, and a dedicated service enforces the HTTP-to-HTTPS redirect.
+The rest of the results follow from Forgejo's and Kong's native behaviour; Section~\ref{sec:discrepancy} discusses the most informative of them.
+
+\subsection{Results}
+
+The suite comprises 18 active tests across seven domains, executed against the testbed.
+Table~\ref{tab:results} reports the per-test outcome.
+The assessment produced 9~\texttt{PASS}, 7~\texttt{FAIL}, 2~\texttt{SKIP}, 0~\texttt{ERROR}, and 98 findings, for a pass rate of 56.2\%.
+
+\begin{table}
+  \caption{Per-test results of the assessment.}
+  \label{tab:results}
+  \begin{tabular}{llr @{\hspace{1em}} | @{\hspace{1em}} llr}
+    \toprule
+    \textbf{Test}                      & \textbf{Status} & \textbf{Findings} & \textbf{Test}   & \textbf{Status} & \textbf{Findings} \\
+    \midrule
+    0.1                                & \texttt{FAIL}   & 16                & 4.1             & \texttt{FAIL}   & 2                 \\
+    0.2                                & \texttt{FAIL}   & 1                 & 4.2             & \texttt{PASS}   & 0                 \\
+    0.3                                & \texttt{SKIP}   & 0                 & 4.3             & \texttt{PASS}   & 0                 \\
+    1.1                                & \texttt{FAIL}   & 74                & 6.2             & \texttt{PASS}   & 0                 \\
+    1.4                                & \texttt{PASS}   & 0                 & 6.4             & \texttt{PASS}   & 0                 \\
+    1.5                                & \texttt{PASS}   & 0                 & 7.2             & \texttt{FAIL}   & 1                 \\
+    1.6                                & \texttt{SKIP}   & 0                 & ext.0.1.nuclei  & \texttt{PASS}   & 0                 \\
+    2.1                                & \texttt{PASS}   & 0                 & ext.1.5.sslyze  & \texttt{FAIL}   & 1                 \\
+    3.3                                & \texttt{PASS}   & 0                 & ext.1.5.testssl & \texttt{FAIL}   & 3                 \\
+    \midrule
+    \multicolumn{5}{r}{\textbf{Total}} & \textbf{98}                                                                                 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Some failures follow directly from the engineered conditions -- the rate-limiting test and the two external TLS analysers, which detect one and three findings respectively on the self-signed certificate -- while others surface native behaviour of Forgejo and Kong, such as the discovery tests, the SSRF test, and test~1.1, which alone accounts for 74 of the 98 findings, a point we return to in Section~\ref{sec:discrepancy}.
+The distribution of findings across these tests confirms that the analysis discriminates individual weaknesses rather than collapsing them into a single verdict.
+
+The two skips illustrate the behaviour of the process in the absence of applicability conditions.
+Every test always produces a result: when the applicable scope is empty or a prerequisite is unmet, that result is a \texttt{SKIP} with an explicit reason, not a silent error.
+The specification of Forgejo declares no deprecated endpoint, so the deprecation test reports a documented skip; the testbed gateway manages no external session store, so the corresponding test does the same.
+In both cases a documented skip is the semantically correct answer, and is distinct from an \texttt{ERROR}, which would indicate a malfunction of the process itself.
+
+The nine successes likewise mix engineered and native outcomes: the security headers test and the HTTP-to-HTTPS redirect test reflect the deliberately configured conditions, while correct token revocation, authorization enforcement, upstream configuration, and the data integrity and availability controls reflect Forgejo's and Kong's own behaviour operating as intended. The external scanner detected no shadow API, confirming that the exposed surface matches the one documented by the specification.
+
+\subsection{A Discrepancy Between Contract and Behaviour}
+\label{sec:discrepancy}
+
+The most informative outcome of the assessment is test~1.1.
+Forgejo declares an authentication requirement at the document level of its specification; the analyser propagates that marker to every endpoint and classifies them as requiring authentication.
+When the test interrogates them without credentials and receives \texttt{2xx}, the three-valued oracle classifies the outcome as \textsc{bypassed} and emits a finding, for a total of 74.
+
+The verdict is contractually correct, and the behaviour it exposes is a genuine misalignment: the endpoints in question are genuinely public, but the published contract does not say so.
+This is precisely the class of anomaly that contract-driven assessment exists to detect, and it is exactly the risk anticipated in Section~\ref{sec:scenario}: an endpoint that responds without credentials while the specification declares it protected invalidates the assumptions that data engineers legitimately make about the pipeline repository.
+A contract that overstates its own protections is as much an assurance defect as an unenforced control, because it leaves every consumer of that contract unable to verify which guarantees actually hold.
+The case also illustrates concretely the epistemic limit of Section~\ref{sec:oracles}: findings of this kind are correct with respect to the contract, and require an analyst to decide whether the discrepancy is an intentional configuration or an actual vulnerability.
+
+\subsection{Determinism, Idempotence, and Footprint}
+
+The assessment was executed twice in sequence against the same testbed, with no manual intervention between the runs.
+Table~\ref{tab:kpi} reports the aggregate indicators.
+Finding counters, per-test statuses, exit code, and pass rate are byte-identical across the two runs: the deterministic part of the result exhibits no variation.
+The wall-clock delta is 0.23\%, which falls within the expected fluctuation of HTTP latency towards the target and is not attributable to non-deterministic behaviour of the process.
+
+Teardown is the precondition of idempotence: without a complete cleanup of the resources created during the first execution, the second would encounter an altered state and produce different results.
+Verification after each run confirmed that the teardown phase drained the LIFO registry with no residual resources, leaving no tokens and no repositories created by the assessment on the target accounts.
+
+The execution profile qualifies operational integrability.
+Of approximately 290~seconds of wall-clock time, the process consumed about 35~seconds of CPU in user space and 41~seconds in kernel space: 26\% of the total.
+The remaining 214~seconds were spent waiting for HTTP responses, for the completion of external analysers, and for disk I/O.
+The regime is dominated by network latency, so optimising the implementation would have marginal impact; the significant reduction would come from parallelising tests within the same batch that have no mutual dependencies, an extension left to future work.
+
+\begin{table}
+  \caption{Aggregate indicators over two independent runs, and execution profile.}
+  \label{tab:kpi}
+  %% SOURCE: merge Tesi/assets/tables/5-idempotenza-kpi.tex and
+  %% 5-performance-baseline.tex into a single table.
+  \begin{tabular}{lrr}
+    \toprule
+    \textbf{Indicator}         & \textbf{Run 1} & \textbf{Run 2} \\
+    \midrule
+    PASS / FAIL / SKIP / ERROR & 9/7/2/0        & 9/7/2/0        \\
+    Total findings             & 98             & 98             \\
+    Pass rate (\%)             & 56.2           & 56.2           \\
+    Exit code                  & 1              & 1              \\
+    Duration (s)               & 290.14         & 290.81         \\
+    Residual resources         & 0              & 0              \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Threats to Validity}
+\label{sec:threats}
+
+Four limits bound the scope of these results.
+First, the correctness of every verdict is conditional on the quality of the specification taken as the oracle: an incomplete contract reduces the observable surface without the process being able to detect the reduction, and a wrong contract grounds correct verdicts on wrong premises.
+Second, validation was conducted on a single target, selected for its structural properties rather than for affinity with the approach; while the absence of any target-specific code makes portability a property of the design, further validation across other services in a Big Data pipeline -- ingestion, processing, and serving components, beyond the repository service evaluated here -- would strengthen the generality of the approach.
+Third, \texttt{WHITE\_BOX} coverage depends on access to the configuration plane of the gateway, which is typically unavailable in managed cloud deployments; in those contexts the assessment degrades to its \texttt{BLACK\_BOX} and \texttt{GREY\_BOX} subsets, with documented rather than silent loss of coverage.
+Fourth, one of the eight domains carries no active tests in the evaluated implementation.
+
+

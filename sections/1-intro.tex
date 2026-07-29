@@ -1,0 +1,29 @@
+%% ============================================================================
+\section{Introduction}
+\label{sec:intro}
+%% ============================================================================
+
+Modern Big Data systems deliver their value through pipelines composed of distributed services, (i.e., ingestion, storage, processing, serving) rather than through a single monolithic engine.
+Trustworthiness in this setting cannot be a property of one layer alone: it must hold at the pipeline level, at the level of the ecosystem of services executing it, at the level of the data it governs, and at the interface level, and it must hold continuously, as pipelines evolve, rather than as a one-off certificate issued at deployment time.
+
+Existing work on Big Data assurance addresses the first two levels. Anisetti et al. propose an assurance process for Big Data pipelines and their underlying ecosystem~\cite{anisettiAssuranceProcessBig2023}; Ardagna et al. address the same problem through service-level agreements~\cite{ardagnaBigDataAssurance2023}; continuous verification across the pipeline life cycle has been framed as a DevSecOps activity~\cite{anisettiDevSecOpsbasedAssuranceProcess2022}; and access control has been enforced at data-ingestion time, an approach recently extended into an attribute-based data engine~\cite{anisettiDynamicScalableEnforcement2021,polimenoBalancingProtectionQuality2025}.
+Across this body of work, the interface level is the least covered.
+
+Yet the interface is where enforcement actually happens. Every access to a Big Data pipeline and to the data it processes crosses an API, typically exposed through a gateway that concentrates authentication, authorization, and rate limiting; a guarantee proven at the pipeline level does not propagate end-to-end if the API exposing that pipeline is permeable.
+
+Automated API testing does not close this gap. Golmohammadi et al. presents a systematic review of 92 contributions shows that only 8 address security testing explicitly~\cite{golmohammadiTestingRESTfulAPIs2023}; and even where security is the explicit target, building the evaluation criteria that decide whether an observed behaviour violates a security guarantee remains the least solved problem in test automation~\cite{barrOracleProblemSoftware2015}.
+
+In this paper we propose a contract-driven approach to the security assurance of Big Data service APIs, in which the target's OpenAPI specification governs the construction of syntactically valid probes and the evaluation criterion of each test is derived from the domain knowledge of the security control being exercised, rather than from the syntax of the request or response alone. The approach is organised around three research questions:
+
+\begin{itemize}
+  \item \textbf{RQ1}: Can security guarantees of an API be verified beyond syntactic conformance, using criteria derived from the semantics of the security controls themselves?
+  \item \textbf{RQ2}: Can such verification be made deterministic and reproducible across independent executions, so that it can be embedded in a continuous release cycle?
+  \item \textbf{RQ3}: Does the resulting approach correctly distinguish enforced from bypassed guarantees on a real target, including anomalies not anticipated in advance?
+\end{itemize}
+
+The contributions of this paper are threefold: (i) an implementation-agnostic eight-domain taxonomy for the security assurance of service APIs, with privilege-aware coverage; (ii) a systematic use of specified oracles in API security testing, with evaluation criteria derived from the semantics of each control; and (iii) a deterministic, DAG-based assessment engine whose output is reproducible and machine-actionable, together with its empirical validation.
+
+The remainder of the paper is organised as follows. Section~\ref{sec:related} discusses related work. Section~\ref{sec:scenario} details the reference scenario. Section~\ref{sec:method} presents the contract-driven approach. Section~\ref{sec:eval} reports the experimental evaluation. Section~\ref{sec:conclusions} draws our conclusions and outlines future work.
+
+
+

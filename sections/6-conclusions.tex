@@ -1,0 +1,16 @@
+%% ============================================================================
+\section{Conclusions}
+\label{sec:conclusions}
+%% ============================================================================
+
+We addressed the security assurance of Big Data services at the level where every access to their data and pipelines is actually enforced: the API.
+We proposed a contract-driven approach in which the OpenAPI specification of the target governs the construction of syntactically valid probes, while the evaluation criterion of each test is derived from the domain knowledge of the security control being exercised and encoded a~priori as a specified oracle.
+Tests are organised in an eight-domain taxonomy whose coverage scales with the privileges available to the assessor, and are executed by a deterministic engine that resolves dependencies topologically and communicates its outcome through semantically distinct exit codes.
+
+The evaluation, conducted on a service instantiating the repository role of a Big Data pipeline delivery workflow and exposed through an API gateway, answers the three research questions of Section~\ref{sec:intro}: the approach distinguishes correctly between conformance and violation on a testbed configured to yield both, including anomalies not anticipated in advance (RQ3); it surfaces a real misalignment between a published contract and the observed behaviour of the system, using criteria derived from the semantics of the security controls themselves (RQ1); and independent executions produce byte-identical results (RQ2), which makes the assessment comparable over time and embeddable in a continuous release cycle.
+
+Future work proceeds along two directions.
+On the operational side, completing the partially covered domains and providing adapters for the managed gateways of the major cloud providers would extend coverage in the deployments where it is currently narrowest.
+On the research side, the formalisation of security oracles remains open: the approach presented here derives evaluation criteria systematically but manually, and characterising the conditions under which such criteria can be derived from the semantics of a control -- rather than authored per control -- is the natural continuation of this work.
+
+

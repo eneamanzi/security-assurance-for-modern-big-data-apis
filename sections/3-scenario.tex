@@ -1,0 +1,28 @@
+%% ============================================================================
+\section{Reference Scenario}
+\label{sec:scenario}
+%% ============================================================================
+
+%We consider the development and delivery of Big Data pipelines.
+%In this scenario, pipeline code, deployment descriptors, build artefacts, and the webhooks that trigger orchestration are managed by a \emph{repository service} that data engineers from different tenants use to upload, version, and activate their pipelines.
+%The service is exposed as a REST API behind an API gateway, which concentrates authentication, authorization, and rate limiting on a single, inspectable configuration plane and constitutes the boundary between clients and internal services~\cite{roseZeroTrustArchitecture2020}.
+
+%This service belongs to the trust perimeter of the pipelines it hosts, and its API is where that perimeter is enforced.
+%A broken object-level authorization check on that API exposes the code and configuration of another tenant's pipeline; an unverified webhook lets an unauthorised party trigger a pipeline execution; an endpoint that responds without credentials while the published specification declares it protected invalidates the assumptions that consumers of that service legitimately make.
+%None of these failures is visible to an assessment conducted one level below, on the pipeline or on the infrastructure: the requests that realise them are syntactically impeccable, and four of the top five categories of the OWASP API Security Top~10 belong to this class~\cite{OWASPTop10}.
+
+%NIST SP~800-228 formalises the same limit for cloud-native APIs, observing that payload-level defences cannot operate at the semantic level of the interface, and prescribing a formal specification with declared request and response schemas as a precondition for any automated verification~\cite{chandramouliGuidelinesAPIProtection2026}.
+
+%The assurance problem we address is therefore the following: given a service of this kind, described by an OpenAPI specification and exposed through a gateway, decide automatically and reproducibly whether the security guarantees its contract declares are actually enforced.
+
+We consider a Big Data platform in which data scientist design, deploy, and operate data-processing pipelines on behalf of multiple tenants. The lifecycle of these pipelines includes source-code development, artefact generation, deployment configuration, execution triggering, and version management. To support these activities, the platform exposes a \emph{repository service} that allows for storing, versioning, publishing, and activating pipelines. Pipeline code, deployment descriptors, build artefacts, and the orchestration are all managed through this service.
+
+The repository service is exposed through a REST API protected by an API gateway. The gateway centralizes authentication, authorization, and rate-limiting policies, providing a single and inspectable control point where all the external requests are enforced~\cite{roseZeroTrustArchitecture2020}. This sevice API constitutes the main trust boundary between clients and the internal components responsible for the big data pipeline storage, deployment, and execution. The correctness of its interface-level security controls directly impacts the security of the entire platform. For example, a broken object-level authorization mechanism may allow one tenant to access the source code or configuration of another tenant's pipeline. Similarly, an improperly protected hook endpoint may enable unauthorized triggering of pipeline executions, while an endpoint that accepts requests without authentication despite being specified as protected violates the security assumptions made by service consumers.
+We note that these vulnerabilities that emerge at the semantic level of the API contract, are largelly not addressed by traditional assessments focused mostly on the lowest layers involving pipeline code, runtime infrastructure, or network configuration.
+Recent guidance, such as NIST SP 800-228, highlights the same limitation for cloud-native APIs, noting that payload-level and infrastructure-level protections cannot reason about the semantic correctness of API behavior~\cite{chandramouliGuidelinesAPIProtection2026}.
+
+In our scenario we assume that the API of the repository service is accompanied by a formal machine-readable specification (i.e., OpenAPI) that explicitly defines operations, request and response schemas, and security requirements.
+
+In this context the assurance problem addressed in this paper is the following. Given a Big Data repository service described by an OpenAPI specification and exposed through an API gateway, determine automatically whether the security guarantees declared in its API contract are actually enforced by the deployed implementation.
+
+

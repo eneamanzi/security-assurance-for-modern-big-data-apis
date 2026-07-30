@@ -2,7 +2,9 @@
 %% ============================================================================
 \section{Contract-Driven API Assurance}
 \label{sec:method}
-%% ============================================================================
+%% ===========================================================================
+
+In this section, we first present the design principles that guided the development of our contract-driven API assurance approach. We then describe the eight-domain taxonomy used to organize the assurance activities. Finally, we present our assessment engine.
 
 \subsection{Design Principles}
 \label{sec:principles}
@@ -52,7 +54,33 @@ Verifying authorization (D2) without having established that authentication work
 Domains D3--D7 belong to distinct semantic families with no mutual ordering constraint.
 Domain D5 (Observability) is architecturally provisioned but carries no active tests in the implementation evaluated here; its numbering is reserved to preserve the coherence of the sequence.
 
-\subsection{Specified Oracles for Security Guarantees}
+\subsection{The Assessment Engine}
+
+The assessment runs as seven phases, split into two groups with different failure semantics.
+
+The first four phases are blocking: reading the configuration, retrieving and validating the OpenAPI specification, building the execution context, and scheduling the tests.
+A failure in any of them stops the process before a single test runs, because nothing downstream can be trusted otherwise.
+
+The last three phases are non-blocking: running the tests, cleaning up, and producing the report.
+A failure in one test is recorded as a structured result and execution continues, so a single broken test cannot silently invalidate the rest of the run.
+
+Tests can declare a dependency on other tests, and a scheduler resolves these dependencies into a topological execution order before anything runs.
+This is a semantic correctness requirement: a test that checks token revocation only makes sense once a test confirming that authentication works has already produced a valid token, and running it earlier would make its outcome depend on scheduling order rather than on the target's actual behaviour.
+Dependency cycles are caught statically, before execution starts.
+A separate check also guards against the rarer case in which the scheduler reaches a deadlock despite an acyclic graph, reporting the exact set of tests that could not be run rather than failing with a generic error.
+
+Determinism (\textbf{G4}) follows from four mechanisms acting together.
+A configuration file fixes every parameter the tool could otherwise decide on its own, leaving no source of variation internal to the tool.
+The scheduling order depends only on declared dependencies, never on chance.
+A lexicographic ordering breaks ties between tests that become ready at the same time.
+The oracles of Section~\ref{sec:oracles} are fixed in advance.
+What is allowed to vary between runs, such as timestamps and internal record identifiers, has no bearing on what matters: the aggregate counts, the per-test verdicts, and the findings.
+
+The process ends with one of four semantically distinct exit codes, which separate success from failure and distinguish different kinds of failure from one another.
+This lets a CI/CD pipeline react automatically, routing a security violation to whoever owns the target and an infrastructural problem to whoever maintains the assessment's own deployment, without anyone having to read the logs first.
+
+
+\subsubsection{Oracles for Security Guarantees}
 \label{sec:oracles}
 
 Generating well-formed input is a largely solved problem in test automation. Deciding whether the resulting behaviour is correct is not, and this is exactly the gap identified as \textbf{G2}.
@@ -94,9 +122,9 @@ Section~\ref{sec:threats} returns to this limit, and Section~\ref{sec:discrepanc
 
 Application agnosticism (Section~\ref{sec:principles}) and these specified oracles together let the tool carry its portability across targets without leaving its security-aware evaluation logic behind, closing \textbf{G3} by no longer trading depth for reach.
 
-\subsection{Privilege-Aware Coverage}
+%\subsubsection{Privilege-Aware Coverage}
 
-Each test requires a specific level of access to the target, and that requirement determines its strategy.
+Each test requires a specific level of access to the target.%, and that requirement determines its strategy.
 
 \texttt{BLACK\_BOX} tests need network access alone.
 They check perimeter controls that the gateway applies to any caller, so probing them without credentials is the only way to see the system as an external attacker would, uncontaminated by any implicit privileges.
@@ -110,27 +138,3 @@ Some guarantees, such as whether a security header is enforced by policy, leave 
 Each test declares its required strategy as fixed metadata; the tool itself does not choose a mode.
 What changes across deployments is the configuration file. When credentials for two roles or admin access to the gateway are unavailable, the corresponding tests are skipped with an explicit reason, and coverage narrows accordingly without any change to the tool.
 
-\subsection{Deterministic Assessment Engine}
-
-The assessment runs as seven phases, split into two groups with different failure semantics.
-
-The first four phases are blocking: reading the configuration, retrieving and validating the OpenAPI specification, building the execution context, and scheduling the tests.
-A failure in any of them stops the process before a single test runs, because nothing downstream can be trusted otherwise.
-
-The last three phases are non-blocking: running the tests, cleaning up, and producing the report.
-A failure in one test is recorded as a structured result and execution continues, so a single broken test cannot silently invalidate the rest of the run.
-
-Tests can declare a dependency on other tests, and a scheduler resolves these dependencies into a topological execution order before anything runs.
-This is a semantic correctness requirement: a test that checks token revocation only makes sense once a test confirming that authentication works has already produced a valid token, and running it earlier would make its outcome depend on scheduling order rather than on the target's actual behaviour.
-Dependency cycles are caught statically, before execution starts.
-A separate check also guards against the rarer case in which the scheduler reaches a deadlock despite an acyclic graph, reporting the exact set of tests that could not be run rather than failing with a generic error.
-
-Determinism (\textbf{G4}) follows from four mechanisms acting together.
-A configuration file fixes every parameter the tool could otherwise decide on its own, leaving no source of variation internal to the tool.
-The scheduling order depends only on declared dependencies, never on chance.
-A lexicographic ordering breaks ties between tests that become ready at the same time.
-The oracles of Section~\ref{sec:oracles} are fixed in advance.
-What is allowed to vary between runs, such as timestamps and internal record identifiers, has no bearing on what matters: the aggregate counts, the per-test verdicts, and the findings.
-
-The process ends with one of four semantically distinct exit codes, which separate success from failure and distinguish different kinds of failure from one another.
-This lets a CI/CD pipeline react automatically, routing a security violation to whoever owns the target and an infrastructural problem to whoever maintains the assessment's own deployment, without anyone having to read the logs first.

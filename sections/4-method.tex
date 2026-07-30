@@ -125,8 +125,7 @@ Section~\ref{sec:threats} returns to this limit, and Section~\ref{sec:discrepanc
 Application agnosticism (Section~\ref{sec:principles}) and these specified oracles together let the tool carry its portability across targets without leaving its security-aware evaluation logic behind, closing \textbf{G3} by no longer trading depth for reach.
 
 %\subsubsection{Privilege-Aware Coverage}
-Running the oracle that judges a guarantee is not always possible from the same vantage point.
-Each test requires a specific level of access to the target.%, and that requirement determines its strategy.
+Running the oracle that judges a guarantee is not always possible from the same vantage point. Each test requires a specific level of access to the target.%, and that requirement determines its strategy.
 
 \texttt{BLACK\_BOX} tests need network access alone.
 They check perimeter controls that the gateway applies to any caller, so probing them without credentials is the only way to see the system as an external attacker would, uncontaminated by any implicit privileges.

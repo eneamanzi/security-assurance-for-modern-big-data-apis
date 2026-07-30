@@ -25,6 +25,7 @@ If behaviour changes between two executions, it is because the configuration cha
 This is the property that turns an assessment from a single observation into a comparable measurement, and it is a precondition for the empirical claims of Section~\ref{sec:eval}.
 
 \subsection{An Eight-Domain Assurance Taxonomy}
+\label{sec:taxonomy}
 
 Security guarantees are organised in eight domains, reported in Table~\ref{tab:domains}, aligned with the risk categories and runtime controls that NIST SP~800-228 identifies for cloud-native APIs~\cite{chandramouliGuidelinesAPIProtection2026}.
 The taxonomy is independent of any implementation: it partitions the security surface of an API exposed through a gateway into semantically distinct categories, each with its own evaluation criteria and priorities, and it is applicable to any structured assessment regardless of the tooling employed.
@@ -55,6 +56,7 @@ Domains D3--D7 belong to distinct semantic families with no mutual ordering cons
 Domain D5 (Observability) is architecturally provisioned but carries no active tests in the implementation evaluated here; its numbering is reserved to preserve the coherence of the sequence.
 
 \subsection{The Assessment Engine}
+\label{sec:engine}
 
 The assessment runs as seven phases, split into two groups with different failure semantics.
 
@@ -73,7 +75,7 @@ Determinism (\textbf{G4}) follows from four mechanisms acting together.
 A configuration file fixes every parameter the tool could otherwise decide on its own, leaving no source of variation internal to the tool.
 The scheduling order depends only on declared dependencies, never on chance.
 A lexicographic ordering breaks ties between tests that become ready at the same time.
-The oracles of Section~\ref{sec:oracles} are fixed in advance.
+The oracles introduced later in Section~\ref{sec:oracles} are fixed in advance.
 What is allowed to vary between runs, such as timestamps and internal record identifiers, has no bearing on what matters: the aggregate counts, the per-test verdicts, and the findings.
 
 The process ends with one of four semantically distinct exit codes, which separate success from failure and distinguish different kinds of failure from one another.
@@ -123,7 +125,7 @@ Section~\ref{sec:threats} returns to this limit, and Section~\ref{sec:discrepanc
 Application agnosticism (Section~\ref{sec:principles}) and these specified oracles together let the tool carry its portability across targets without leaving its security-aware evaluation logic behind, closing \textbf{G3} by no longer trading depth for reach.
 
 %\subsubsection{Privilege-Aware Coverage}
-
+Running the oracle that judges a guarantee is not always possible from the same vantage point.
 Each test requires a specific level of access to the target.%, and that requirement determines its strategy.
 
 \texttt{BLACK\_BOX} tests need network access alone.

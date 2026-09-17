@@ -55,8 +55,8 @@ Barr et al. survey this as the oracle problem, and identify the automated constr
 %Two further gaps remain.
 %Tools that are portable across targets use the specification to generate syntactically valid requests but not to judge whether responses respect the declared security contract, while tools that reach semantic depth are anchored to a single platform.
 %And the absence of deterministic execution prevents results from being compared across successive runs, which is the precondition for embedding verification in a continuous release cycle.
-Lack of Security Contract Validation in Cross-Target Tools (\textbf{G3}): Portable tools can leverage specifications to generate syntactically valid requests across different targets, but they do not verify whether the corresponding responses comply with the security properties declared in those specifications. As a result, portability is achieved at the expense of security-aware semantic validation.
+\revMin{Lack of Security Contract Validation in Cross-Target Tools (\textbf{G3}): Portable tools can leverage specifications to generate syntactically valid requests across different targets, but they do not verify whether the corresponding responses comply with the security properties declared in those specifications. As a result, portability is achieved at the expense of security-aware semantic validation.}
 
-Absence of Deterministic Execution for Continuous Verification (\textbf{G4}): Existing approaches lack deterministic execution, leading to variations in results across successive runs. This prevents reliable comparison of outcomes over time and hinders the integration of automated verification into continuous release and deployment pipelines.
+\revMin{Absence of Deterministic Execution for Continuous Verification (\textbf{G4}): Existing approaches lack deterministic execution, leading to variations in results across successive runs. This prevents reliable comparison of outcomes over time and hinders the integration of automated verification into continuous release and deployment pipelines.}
 
 

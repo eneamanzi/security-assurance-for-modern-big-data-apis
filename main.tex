@@ -36,9 +36,10 @@
 \definecolor{revT1}{HTML}{FFE066} %% Tema 1: singolo target / generalizzabilita' (R1+R2)
 \definecolor{revT2}{HTML}{FF8A8A} %% Tema 2: legame Forgejo <-> Big Data (R1)
 \definecolor{revT3}{HTML}{8ACBFF} %% Tema 3: metriche non bastano (R1)
-\definecolor{revT4}{HTML}{9BE39B} %% Tema 4: vulnerabilita' reale vs violazione contrattuale (R2)
+\definecolor{revT4}{HTML}{FFB347} %% Tema 4: vulnerabilita' reale vs violazione contrattuale (R2)
 \definecolor{revT5}{HTML}{C9A0FF} %% Tema 5: definizione manuale degli oracoli (R2)
 \definecolor{revMin}{HTML}{D9D9D9} %% Minor: citazioni sui gap (R2)
+\definecolor{revFix}{HTML}{9BE39B} %% Modifiche/soluzioni proposte (testo nuovo/rivisto)
 %% NOTA: i nomi dei comandi non possono terminare con una cifra (TeX legge
 %% un control word come una sequenza di sole lettere: "\revT2" verrebbe letto
 %% come "\revT" seguito dal carattere "2", non come un unico comando).
@@ -48,6 +49,7 @@
 \DeclareRobustCommand{\revTfour}[1]{{\sethlcolor{revT4}\hl{#1}}}
 \DeclareRobustCommand{\revTfive}[1]{{\sethlcolor{revT5}\hl{#1}}}
 \DeclareRobustCommand{\revMin}[1]{{\sethlcolor{revMin}\hl{#1}}}
+\DeclareRobustCommand{\revFix}[1]{{\sethlcolor{revFix}\hl{#1}}}
 
 %%
 %% end of the preamble, start of the body of the document source.
@@ -134,9 +136,13 @@
 
   %Existing solutions further trade portability off against depth, and non-deterministic execution undermines reproducibility.
 
-  \revTtwo{This work proposes a contract-driven approach to the security assurance of Big Data service APIs.}
+  This work proposes a contract-driven approach to the security assurance of Big Data service APIs.
   Leveraging the target's OpenAPI specification, the framework generates syntactically valid probes and derives evaluation criteria from the semantics of the assessed controls, embedding them into deterministic test oracles organized into an eight-domain taxonomy that scales coverage with the privileges available during testing.
-  \revTtwo{The approach was validated on Forgejo 14.0.3 deployed behind Kong 3.9, instantiating the repository service through which Big Data pipelines are developed and delivered.} Results show that the framework correctly classified all test cases, revealed a real discrepancy between the specification's declared requirements and the target's actual behavior, and produced identical outputs across independent runs.
+  % OLD
+  % The approach was validated on Forgejo 14.0.3 deployed behind Kong 3.9, instantiating the repository service through which Big Data pipelines are developed and delivered.}
+  \revFix{The approach was validated on Forgejo 14.0.3 deployed behind Kong 3.9, a service that exposes the same interface-layer properties -- a native contract, gateway-enforced access control, multi-tenant roles -- as any Big Data service delivered this way. These properties, not the particular service or workload behind them, are what the approach verifies, so it applies equally to any service that exposes them -- Forgejo is simply one such example.}
+  Results show that the framework correctly classified all test cases, revealed a real discrepancy between the specification's declared requirements and the target's actual behavior, and produced identical outputs across independent runs.
+
 
   %Overall, this work contributes an implementation-agnostic eight-domain taxonomy for the security assurance of Big Data service interfaces, a systematic approach to the oracle problem grounded in security semantics, and a deterministic, DAG-based assessment engine ready for integration into automated delivery pipelines.
 \end{abstract}

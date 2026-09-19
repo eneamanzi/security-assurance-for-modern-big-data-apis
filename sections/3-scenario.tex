@@ -26,4 +26,6 @@ In our scenario we assume that the API of the repository service is accompanied 
 
 \revTtwo{In this context the assurance problem addressed in this paper is the following. Given a Big Data repository service described by an OpenAPI specification and exposed through an API gateway, determine automatically whether the security guarantees declared in its API contract are actually enforced by the deployed implementation.}
 
+\revFix{This problem is defined at the interface layer: it depends on a machine-readable contract, a gateway enforcing access control, and distinct tenant roles, rather than on the data a pipeline processes. Any Big Data service exposed this way exhibits these properties, so what makes a target representative is the structure of its interface, not the nature of its payloads.}
+
 

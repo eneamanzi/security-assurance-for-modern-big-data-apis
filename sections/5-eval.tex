@@ -6,8 +6,12 @@
 
 \subsection{Testbed}
 
-\revTtwo{We use Forgejo~14.0.3} \cite{forgejoContributors2026} \revTtwo{as the target, instantiating the repository service of the reference scenario of} Section~\ref{sec:scenario}.
-\revTtwo{Forgejo is a self-hosted Git service exposing repositories, users, tokens, and webhooks through a REST API documented by a natively generated OpenAPI specification, with real authentication, two distinct privilege levels, and parameterised endpoints with resolvable path values.}
+% OLD
+% \revTtwo{We use Forgejo~14.0.3} \cite{forgejoContributors2026} \revTtwo{as the target, instantiating the repository service of the reference scenario of} Section~\ref{sec:scenario}.
+%\revTtwo{Forgejo is a self-hosted Git service exposing repositories, users, tokens, and webhooks through a REST API documented by a natively generated OpenAPI specification, with real authentication, two distinct privilege levels, and parameterised endpoints with resolvable path values.}
+
+\revFix{We use Forgejo~14.0.3} \cite{forgejoContributors2026} \revFix{as the target, because it exposes the interface-layer properties that} Section~\ref{sec:scenario} \revFix{requires, none of which is specific to Forgejo -- they are common to any service exposed this way.
+  Concretely, Forgejo is a self-hosted Git service exposing repositories, users, tokens, and webhooks through a REST API documented by a natively generated OpenAPI specification, with real authentication, two distinct privilege levels, and parameterised endpoints with resolvable path values.}
 
 Forgejo is exposed through Kong~3.9~\cite{kongGateway2026} in DB-less mode, with PostgreSQL~15-alpine as Forgejo's persistence backend; an ephemeral container provisions three accounts at first start -- an administrator and two ordinary users -- and terminates.
 All services run in a dedicated Docker network declared in a single Compose file, on a development host, without dedicated hardware.
@@ -77,7 +81,10 @@ The testbed combines deliberately engineered conditions with Forgejo's and Kong'
 
 The suite comprises 18 active tests across seven domains, executed against the testbed.
 Table~\ref{tab:results} reports the per-test outcome.
-\revTthree{The assessment produced 9~\texttt{PASS}, 7~\texttt{FAIL}, 2~\texttt{SKIP}, 0~\texttt{ERROR}, and 98 findings, for a pass rate of 56.2\%.}
+% OLD
+% \revTthree{The assessment produced 9~\texttt{PASS}, 7~\texttt{FAIL}, 2~\texttt{SKIP}, 0~\texttt{ERROR}, and 98 findings, for a pass rate of 56.2\%.}
+\revFix{The assessment produced 9~\texttt{PASS}, 7~\texttt{FAIL}, 2~\texttt{SKIP}, 0~\texttt{ERROR}, and 98 findings, for a pass rate of 56.2\%.
+  These counts measure discrimination rather than the target's security posture: each verdict is read against the outcome expected when the testbed was configured, so the aggregate shows whether every deliberately broken condition was caught and every correctly configured one was cleared. Each verdict is backed by the evidence recorded in the report the engine produces} (Section~\ref{sec:engine}).
 
 \begin{table}
   \caption{Per-test results of the assessment.}
@@ -126,7 +133,7 @@ When the test interrogates them without credentials and receives \texttt{2xx}, t
 \subsection{Determinism, Idempotence, and Footprint}
 
 The assessment was executed twice in sequence against the same testbed, with no manual intervention between the runs.
-\revTthree{Both runs produced 9~PASS, 7~FAIL, 2~SKIP, and 0~ERROR, with 98 findings, a 56.2\% pass rate, and exit code~1.}
+Both runs produced 9~PASS, 7~FAIL, 2~SKIP, and 0~ERROR, with 98 findings, a 56.2\% pass rate, and exit code~1.
 Wall-clock duration was 290.14~s in the first run and 290.81~s in the second, a 0.23\% difference consistent with ordinary fluctuation in HTTP latency towards the target rather than with non-deterministic behaviour of the process.
 
 Teardown is the precondition of idempotence: without a complete cleanup of the resources created during the first execution, the second would encounter an altered state and produce different results.
@@ -140,11 +147,14 @@ The regime is dominated by network latency, so optimising the implementation wou
 \subsection{Threats to Validity}
 \label{sec:threats}
 
-Four limits bound the scope of these results.
-\revTfour{First, the correctness of every verdict is conditional on the quality of the specification taken as the oracle: an incomplete contract reduces the observable surface without the process being able to detect the reduction, and a wrong contract grounds correct verdicts on wrong premises.}
-\revTone{Second, validation was conducted on a single target, selected for its structural properties rather than for affinity with the approach; while the absence of any target-specific code makes portability a property of the design, further validation across other services in a Big Data pipeline -- ingestion, processing, and serving components, beyond the repository service evaluated here -- would strengthen the generality of the approach.}
+Five limits bound the scope of these results.
+% OLD
+% \revTfour{First, the correctness of every verdict is conditional on the quality of the specification taken as the oracle: an incomplete contract reduces the observable surface without the process being able to detect the reduction, and a wrong contract grounds correct verdicts on wrong premises.}
+\revFix{First, the correctness of every verdict is conditional on the quality of the specification taken as the oracle: an incomplete contract reduces the observable surface without the process being able to detect the reduction, and a wrong contract grounds correct verdicts on wrong premises. The approach reports every deviation from the declared contract together with the evidence behind it; judging its severity or exploitability is left to whoever consumes that report, manually or with another tool.}
+% OLD
+% \revTone{Second, validation was conducted on a single target, selected for its structural properties rather than for affinity with the approach; while the absence of any target-specific code makes portability a property of the design, further validation across other services in a Big Data pipeline -- ingestion, processing, and serving components, beyond the repository service evaluated here -- would strengthen the generality of the approach.}
+\revFix{Second, validation was conducted on a single target, selected because it exhibits the interface-layer properties of} Section~\ref{sec:scenario}\revFix{ rather than for affinity with the approach. The absence of any target-specific code makes the approach portable and transferable by design, but confirming this empirically across further services -- ingestion, processing, and serving components of a Big Data pipeline -- would strengthen the generality of the approach.}
 Third, \texttt{WHITE\_BOX} coverage depends on access to the configuration plane of the gateway, which is typically unavailable in managed cloud deployments; in those contexts the assessment degrades to its \texttt{BLACK\_BOX} and \texttt{GREY\_BOX} subsets, with documented rather than silent loss of coverage.
 Fourth, one of the eight domains carries no active tests in the evaluated implementation.
-\revTfive{TODO: Fifth, manual oracle authoring -- content to be written.}
-
+\revFix{Fifth, every oracle is authored manually. A reliable, automated way to generate them is, in our view, a research problem of its own, much as judging the severity of a finding is. Manual authoring was chosen to keep the engine fully extensible: automatically generated oracles could be integrated in the future as long as they respect the interfaces the engine expects, without changing how tests are scheduled or executed.}
 

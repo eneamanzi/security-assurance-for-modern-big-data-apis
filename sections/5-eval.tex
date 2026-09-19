@@ -19,8 +19,8 @@ Figure~\ref{fig:testbed} shows the topology.
 Kong exposes three ports: plain HTTP for the redirect test, HTTPS with a locally generated self-signed certificate as the primary endpoint, and the Admin API supplying configuration data to the \texttt{WHITE\_BOX} tests.
 DB-less mode matters for validation: the configuration lives entirely in a version-controlled file mounted read-only and cannot be altered at runtime, which guarantees that the gateway state is identical at every start.
 
-\revTtwo{Because the implementation contains no reference to Forgejo, changing target means updating the configuration file -- gateway URL, specification path, path seeds, credentials -- not modifying code.}
-This is the concrete demonstration of the application agnosticism claimed in Section~\ref{sec:method}.
+Because the implementation contains no reference to Forgejo, changing target means updating the configuration file -- gateway URL, specification path, path seeds, credentials -- not modifying code.
+This is the concrete demonstration of the application agnosticism claimed in Section~\ref{sec:method}\revFix{, and it is why the same suite applies unchanged to any other service exhibiting the interface-layer properties of Section}~\ref{sec:scenario}.
 
 \begin{figure}[t]
   \centering
@@ -71,11 +71,11 @@ This is the concrete demonstration of the application agnosticism claimed in Sec
 \subsection{Experimental Design}
 
 %Validating an assessment approach against a correctly configured environment would produce a suite of uniform successes: a tautological result that demonstrates nothing about the ability to detect real violations.
-\revTthree{The testbed is configured so that some tests yield expected failures and others yield expected successes, and the combination constitutes a functionally complete bench on which the approach must distinguish the two.}
+The testbed is configured so that some tests yield expected failures and others yield expected successes, and the combination constitutes a functionally complete bench on which the approach must distinguish the two.
 The testbed combines deliberately engineered conditions with Forgejo's and Kong's behaviour as deployed, which the testbed does not control and cannot predict in advance.
-\revTthree{Some conditions were deliberately broken to produce expected failures: for instance, Kong's rate-limiting plugin is disabled, a recurrent condition in non-production environments where throttling interferes with application testing, and the TLS certificate is self-signed, which by construction exhibits configurations below production baselines.
-  Others were deliberately configured to produce expected successes: for instance, a response transformer injects the HTTP security headers on every response, and a dedicated service enforces the HTTP-to-HTTPS redirect.
-  The rest of the results follow from Forgejo's and Kong's native behaviour;} Section~\ref{sec:discrepancy} discusses the most informative of them.
+Some conditions were deliberately broken to produce expected failures: for instance, Kong's rate-limiting plugin is disabled, a recurrent condition in non-production environments where throttling interferes with application testing, and the TLS certificate is self-signed, which by construction exhibits configurations below production baselines.
+Others were deliberately configured to produce expected successes: for instance, a response transformer injects the HTTP security headers on every response, and a dedicated service enforces the HTTP-to-HTTPS redirect.
+The rest of the results follow from Forgejo's and Kong's native behaviour; Section~\ref{sec:discrepancy} discusses the most informative of them.
 
 \subsection{Results}
 
@@ -108,15 +108,15 @@ Table~\ref{tab:results} reports the per-test outcome.
   \end{tabular}
 \end{table}
 
-\revTthree{Some failures follow directly from the engineered conditions -- the rate-limiting test and the two external TLS analysers, which detect one and three findings respectively on the self-signed certificate -- while others surface native behaviour of Forgejo and Kong, such as the discovery tests, the SSRF test, and test~1.1, which alone accounts for 74 of the 98 findings, a point we return to in} Section~\ref{sec:discrepancy}\revTthree{.
-  The distribution of findings across these tests confirms that the analysis discriminates individual weaknesses rather than collapsing them into a single verdict.}
+Some failures follow directly from the engineered conditions -- the rate-limiting test and the two external TLS analysers, which detect one and three findings respectively on the self-signed certificate -- while others surface native behaviour of Forgejo and Kong, such as the discovery tests, the SSRF test, and test~1.1, which alone accounts for 74 of the 98 findings, a point we return to in Section~\ref{sec:discrepancy}.
+The distribution of findings across these tests confirms that the analysis discriminates individual weaknesses rather than collapsing them into a single verdict.
 
 The two skips illustrate the behaviour of the process in the absence of applicability conditions.
 Every test always produces a result: when the applicable scope is empty or a prerequisite is unmet, that result is a \texttt{SKIP} with an explicit reason, not a silent error.
 The specification of Forgejo declares no deprecated endpoint, so the deprecation test reports a documented skip; the testbed gateway manages no external session store, so the corresponding test does the same.
 In both cases a documented skip is the semantically correct answer, and is distinct from an \texttt{ERROR}, which would indicate a malfunction of the process itself.
 
-\revTthree{The nine successes likewise mix engineered and native outcomes: the security headers test and the HTTP-to-HTTPS redirect test reflect the deliberately configured conditions, while correct token revocation, authorization enforcement, upstream configuration, and the data integrity and availability controls reflect Forgejo's and Kong's own behaviour operating as intended. The external scanner detected no shadow API, confirming that the exposed surface matches the one documented by the specification.}
+
 
 \subsection{A Discrepancy Between Contract and Behaviour}
 \label{sec:discrepancy}
@@ -125,10 +125,9 @@ The most informative outcome of the assessment is test~1.1.
 Forgejo declares an authentication requirement at the document level of its specification; the analyser propagates that marker to every endpoint and classifies them as requiring authentication.
 When the test interrogates them without credentials and receives \texttt{2xx}, the three-valued oracle classifies the outcome as \textsc{bypassed} and emits a finding, for a total of 74.
 
-\revTfour{The verdict is contractually correct, and the behaviour it exposes is a genuine misalignment: the endpoints in question are genuinely public, but the published contract does not say so.
-  This is precisely the class of anomaly that contract-driven assessment exists to detect, and it is exactly the risk anticipated in} Section~\ref{sec:scenario}\revTfour{: an endpoint that responds without credentials while the specification declares it protected invalidates the assumptions that data engineers legitimately make about the pipeline repository.
-  A contract that overstates its own protections is as much an assurance defect as an unenforced control, because it leaves every consumer of that contract unable to verify which guarantees actually hold.
-  The case also illustrates concretely the epistemic limit of} Section~\ref{sec:oracles}\revTfour{: findings of this kind are correct with respect to the contract, and require an analyst to decide whether the discrepancy is an intentional configuration or an actual vulnerability.}
+The verdict is contractually correct, and the behaviour it exposes is a genuine misalignment: the endpoints in question are genuinely public, but the published contract does not say so.
+This is precisely the class of anomaly that contract-driven assessment exists to detect, and it is exactly the risk anticipated in Section~\ref{sec:scenario}: an endpoint that responds without credentials while the specification declares it protected invalidates the assumptions that data engineers legitimately make about the pipeline repository.
+A contract that overstates its own protections is as much an assurance defect as an unenforced control, because it leaves every consumer of that contract unable to verify which guarantees actually hold. The case also illustrates concretely the epistemic limit of Section~\ref{sec:oracles}: findings of this kind are correct with respect to the contract, and require an analyst to decide whether the discrepancy is an intentional configuration or an actual vulnerability \revFix{-- the same distinction Section}~\ref{sec:threats} \revFix{treats as a general limit of the approach.}
 
 \subsection{Determinism, Idempotence, and Footprint}
 

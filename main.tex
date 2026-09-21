@@ -141,7 +141,7 @@
   Leveraging the target's OpenAPI specification, the framework generates syntactically valid probes and derives evaluation criteria from the semantics of the assessed controls, embedding them into deterministic test oracles organized into an eight-domain taxonomy that scales coverage with the privileges available during testing.
   % OLD
   % The approach was validated on Forgejo 14.0.3 deployed behind Kong 3.9, instantiating the repository service through which Big Data pipelines are developed and delivered.}
-  \revFix{The approach was validated on Forgejo 14.0.3 deployed behind Kong 3.9, a service that exposes the same interface-layer properties -- a native contract, gateway-enforced access control, multi-tenant roles -- as any Big Data service delivered this way. These properties, not the particular service or workload behind them, are what the approach verifies, so it applies equally to any service that exposes them -- Forgejo is simply one such example.}
+  The approach was validated on Forgejo 14.0.3 deployed behind Kong 3.9, a service that exposes the same interface-layer properties -- a native contract, gateway-enforced access control, multi-tenant roles -- as any Big Data service delivered this way. These properties are what the approach verifies, so it applies equally to any service that exposes them -- Forgejo is simply one such example.
   Results show that the framework correctly classified all test cases, revealed a real discrepancy between the specification's declared requirements and the target's actual behavior, and produced identical outputs across independent runs.
 
 
